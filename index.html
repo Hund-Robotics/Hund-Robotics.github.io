@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUND Robotics | Autonomous Quadruped Systems & Defense</title>
+  <title>HUND Robotics | Academic Capstone Research Quadruped</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js CDN -->
@@ -17,937 +17,616 @@
         extend: {
           colors: {
             brand: {
-              black: '#07090e',
-              dark: '#0c1017',
-              panel: '#121824',
-              border: '#1f293d',
-              cyan: '#00f0ff',
-              cyanGlow: 'rgba(0, 240, 255, 0.25)',
-              amber: '#ffaa00',
-              crimson: '#ff003c',
-              emerald: '#00ff88'
+              black: '#090d14',
+              dark: '#0e1522',
+              card: '#141d2e',
+              border: '#1f2e48',
+              accent: '#38bdf8', // Sky/Cyan engineering
+              amber: '#f59e0b',  // CBU Gold / Engineering amber
+              emerald: '#10b981',
+              violet: '#818cf8'
             }
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
             mono: ['JetBrains Mono', 'Fira Code', 'monospace']
-          },
-          animation: {
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'scanline': 'scan 8s linear infinite',
-            'spin-slow': 'spin 12s linear infinite'
-          },
-          keyframes: {
-            scan: {
-              '0%': { transform: 'translateY(-100%)' },
-              '100%': { transform: 'translateY(1000%)' }
-            }
           }
         }
       }
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
     
     body {
-      background-color: #07090e;
+      background-color: #090d14;
       color: #e2e8f0;
-      overflow-x: hidden;
       font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
     }
 
-    /* Custom Tech Grid & Scanline FX */
-    .bg-grid-tech {
-      background-size: 40px 40px;
+    .blueprint-grid {
+      background-size: 32px 32px;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(to right, rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
     }
 
-    .glow-cyan {
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
-    }
-    
-    .glow-cyan-sm {
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    .clip-corner {
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
     }
 
-    /* Custom Scrollbar */
+    /* Custom Tech Scrollbar */
     ::-webkit-scrollbar {
-      width: 6px;
+      width: 7px;
     }
     ::-webkit-scrollbar-track {
-      background: #07090e;
+      background: #090d14;
     }
     ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 3px;
+      background: #1e2e48;
+      border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #00f0ff;
-    }
-    
-    /* HUD Corner Cutouts */
-    .clip-tech {
-      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-    }
-    .clip-tag {
-      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+      background: #38bdf8;
     }
   </style>
 </head>
-<body class="bg-brand-black text-slate-200 antialiased selection:bg-brand-cyan selection:text-black">
+<body class="bg-brand-black text-slate-200 antialiased selection:bg-brand-accent selection:text-brand-black">
 
-  <!-- Top Global Tech Status Bar -->
-  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-brand-black/85 border-b border-brand-border/70 transition-all duration-300">
+  <!-- Top Navigation Bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-brand-black/90 border-b border-brand-border transition-all">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <!-- Brand Logo -->
+      
+      <!-- Brand & University affiliation -->
       <a href="#" class="flex items-center space-x-3 group">
-        <div class="w-9 h-9 bg-brand-panel border border-brand-cyan/40 rounded flex items-center justify-center relative overflow-hidden group-hover:border-brand-cyan transition-colors">
-          <div class="absolute inset-0 bg-brand-cyan/10 scale-0 group-hover:scale-100 transition-transform"></div>
-          <span class="font-mono font-black text-lg text-brand-cyan tracking-wider">H</span>
-          <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-cyan"></div>
+        <div class="w-10 h-10 bg-brand-card border border-brand-accent/50 rounded-lg flex items-center justify-center font-mono font-bold text-brand-accent group-hover:border-brand-accent transition-colors shadow-sm">
+          3DoF
         </div>
         <div>
-          <span class="font-extrabold tracking-widest text-lg text-white">HUND<span class="text-brand-cyan font-mono text-sm ml-1">//ROBOTICS</span></span>
-          <p class="text-[9px] font-mono text-slate-500 uppercase tracking-widest hidden sm:block">Tactical Quadruped Systems</p>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold tracking-tight text-white text-base">HUND <span class="text-brand-accent font-mono">ROBOTICS</span></span>
+            <span class="px-1.5 py-0.5 text-[9px] font-mono font-semibold bg-brand-amber/15 text-brand-amber border border-brand-amber/30 rounded">CAPSTONE '26</span>
+          </div>
+          <p class="text-[10px] font-mono text-slate-400">Quadruped Autonomous Kinematics Research</p>
         </div>
       </a>
 
-      <!-- Desktop Nav Links -->
-      <nav class="hidden md:flex items-center space-x-8 text-xs font-mono tracking-wider">
-        <a href="#simulator" class="text-slate-400 hover:text-brand-cyan transition-colors flex items-center space-x-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-brand-cyan/50"></span>
-          <span>SIMULATOR</span>
+      <!-- Desktop Links -->
+      <nav class="hidden md:flex items-center space-x-7 text-xs font-mono text-slate-300">
+        <a href="#simulator" class="hover:text-brand-accent transition-colors flex items-center space-x-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-accent"></span>
+          <span>3D SIMULATOR</span>
         </a>
-        <a href="#fleet" class="text-slate-400 hover:text-brand-cyan transition-colors">FLEET UNITS</a>
-        <a href="#telemetry" class="text-slate-400 hover:text-brand-cyan transition-colors">TELEMETRY</a>
-        <a href="#payloads" class="text-slate-400 hover:text-brand-cyan transition-colors">PAYLOADS</a>
-        <a href="#solutions" class="text-slate-400 hover:text-brand-cyan transition-colors">INDUSTRIES</a>
-        <a href="#calculator" class="text-slate-400 hover:text-brand-cyan transition-colors">DEPLOY</a>
+        <a href="#kinematics" class="hover:text-brand-accent transition-colors">3-DoF KINEMATICS</a>
+        <a href="#perception" class="hover:text-brand-accent transition-colors">VISION &amp; SLAM</a>
+        <a href="#timeline" class="hover:text-brand-accent transition-colors">ROADMAP</a>
+        <a href="#sponsorship" class="hover:text-brand-amber transition-colors font-semibold text-brand-amber">SPONSOR &amp; DONATE</a>
       </nav>
 
-      <!-- System status indicator & Contact button -->
-      <div class="flex items-center space-x-4">
-        <div class="hidden lg:flex items-center space-x-2 text-[10px] font-mono px-2.5 py-1 bg-brand-panel border border-brand-border rounded">
-          <span class="w-2 h-2 rounded-full bg-brand-emerald animate-pulse"></span>
-          <span class="text-slate-400">CORE ARCH v4.19</span>
-          <span class="text-brand-cyan">ONLINE</span>
-        </div>
-        <a href="#calculator" class="clip-tech px-4 py-2 bg-brand-cyan text-brand-black text-xs font-bold font-mono tracking-wider hover:bg-white transition-all shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-          DEPLOY FLEET &rarr;
+      <!-- Primary Email Action -->
+      <div class="flex items-center space-x-3">
+        <a href="mailto:timothym.huang@calbaptist.edu?subject=HUND%20Robotics%20Capstone%20Inquiry%20%2F%20Sponsorship" 
+           class="clip-corner px-4 py-2 bg-brand-accent hover:bg-white text-brand-black text-xs font-mono font-bold tracking-wider transition-all flex items-center space-x-2 shadow-[0_0_15px_rgba(56,189,248,0.25)]">
+          <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+          <span>CONTACT LEAD</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- HERO & INTERACTIVE QUADRUPED 3D LAB -->
-  <section id="simulator" class="relative pt-24 pb-16 min-h-screen bg-grid-tech flex flex-col justify-center border-b border-brand-border">
-    <!-- Background Ambient Lighting -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-brand-cyan/10 blur-[130px] rounded-full pointer-events-none"></div>
-
+  <!-- HERO & INTERACTIVE 3D RESEARCH BENCH -->
+  <section id="simulator" class="relative pt-24 pb-16 min-h-screen blueprint-grid flex flex-col justify-center border-b border-brand-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row gap-8 items-stretch pt-4">
       
-      <!-- Left Column: Vision & Pitch -->
-      <div class="lg:w-5/12 flex flex-col justify-between py-4">
+      <!-- Left Column: Capstone Overview -->
+      <div class="lg:w-5/12 flex flex-col justify-between py-2">
         <div>
-          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded bg-brand-panel border border-brand-border text-brand-cyan text-xs font-mono mb-6">
-            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-brand-cyan"></i>
-            <span>ENTERPRISE MIL-SPEC AUTONOMY</span>
+          <!-- Academic Tag -->
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded bg-brand-card border border-brand-border text-xs font-mono mb-4 text-brand-accent">
+            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-brand-amber"></i>
+            <span>CALIFORNIA BAPTIST UNIVERSITY &bull; SENIOR CAPSTONE</span>
           </div>
 
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight uppercase">
-            Bred for the <br/>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-teal-300 to-emerald-400">
-              Unforgiving.
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight uppercase">
+            Autonomous Quadruped <br/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent via-teal-300 to-brand-amber">
+              Research Platform
             </span>
           </h1>
 
-          <p class="mt-5 text-slate-400 text-sm sm:text-base leading-relaxed font-light">
-            Engineered for hostile perimeter defense, subterranean mining surveys, hazardous CBRN reconnaissance, and disaster response. The HUND Autonomous Quadruped platform combines high-torque harmonic drives with neural edge perception.
+          <p class="mt-4 text-slate-300 text-sm leading-relaxed font-light">
+            <strong>HUND Robotics</strong> is an undergraduate engineering capstone endeavor dedicated to developing an open, robust, and cost-effective legged platform. Utilizing <strong>12 active degrees of freedom (3-DoF per limb)</strong>, stereo camera visual odometry, and semi-autonomous human-supervised navigation.
           </p>
 
-          <!-- Quick Metrics Bar -->
-          <div class="grid grid-cols-3 gap-3 my-8 pt-4 border-t border-brand-border">
-            <div class="p-3 bg-brand-panel/60 border border-brand-border rounded">
-              <span class="text-xs font-mono text-slate-500 block">MAX SPEED</span>
-              <span class="text-xl font-bold font-mono text-white">4.8 <span class="text-xs text-brand-cyan">m/s</span></span>
+          <!-- Core Research Spec Pill Grid -->
+          <div class="grid grid-cols-3 gap-2.5 my-6 font-mono text-xs">
+            <div class="p-3 bg-brand-card/90 border border-brand-border rounded">
+              <span class="text-[10px] text-slate-400 block uppercase">Leg Topology</span>
+              <span class="text-base font-bold text-white">3-DoF <span class="text-xs text-brand-accent">/ Leg</span></span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">12-DoF Total</span>
             </div>
-            <div class="p-3 bg-brand-panel/60 border border-brand-border rounded">
-              <span class="text-xs font-mono text-slate-500 block">PAYLOAD</span>
-              <span class="text-xl font-bold font-mono text-white">45 <span class="text-xs text-brand-cyan">kg</span></span>
+            <div class="p-3 bg-brand-card/90 border border-brand-border rounded">
+              <span class="text-[10px] text-slate-400 block uppercase">Actuation</span>
+              <span class="text-base font-bold text-white">QDD <span class="text-xs text-brand-amber">Motor</span></span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">Quasi-Direct</span>
             </div>
-            <div class="p-3 bg-brand-panel/60 border border-brand-border rounded">
-              <span class="text-xs font-mono text-slate-500 block">INGRESS</span>
-              <span class="text-xl font-bold font-mono text-white">IP67 <span class="text-xs text-brand-emerald">&check;</span></span>
+            <div class="p-3 bg-brand-card/90 border border-brand-border rounded">
+              <span class="text-[10px] text-slate-400 block uppercase">Perception</span>
+              <span class="text-base font-bold text-white">Stereo <span class="text-xs text-brand-accent">FOV</span></span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">Visual SLAM</span>
             </div>
           </div>
         </div>
 
-        <!-- Quick Terminal Log Stream -->
-        <div class="p-3.5 bg-brand-panel border border-brand-border rounded text-xs font-mono">
-          <div class="flex items-center justify-between text-slate-400 border-b border-brand-border pb-2 mb-2">
-            <span class="flex items-center space-x-1.5">
-              <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
-              <span class="text-[11px] text-slate-300 font-semibold">NEURAL GAIT ENGINE</span>
+        <!-- Academic Goal & Quick Contact Banner -->
+        <div class="p-4 bg-brand-card border border-brand-border rounded-lg text-xs font-mono">
+          <div class="flex items-center justify-between border-b border-brand-border pb-2 mb-2 text-slate-300">
+            <span class="flex items-center space-x-1.5 text-brand-accent font-semibold">
+              <i data-lucide="microchip" class="w-4 h-4"></i>
+              <span>CAPSTONE PROJECT INQUIRIES</span>
             </span>
-            <span id="hz-indicator" class="text-[10px] text-brand-cyan">1000 Hz RTOS</span>
+            <span class="text-[10px] text-brand-amber">RIVERSIDE, CA</span>
           </div>
-          <p id="live-sim-status" class="text-slate-400 text-[11px] truncate">
-            &gt; Quadruped inverse kinematics solver: STABLE (Trot Mode)
+          <p class="text-slate-400 leading-relaxed text-[11px]">
+            Seeking academic mentors, lab sponsors, and technical partners. Contact capstone engineer Timothy Huang directly:
           </p>
+          <a href="mailto:timothym.huang@calbaptist.edu?subject=HUND%20Robotics%20Academic%20Inquiry" class="inline-flex items-center space-x-1.5 text-brand-accent hover:text-white mt-2 font-bold transition-colors">
+            <span>timothym.huang@calbaptist.edu</span>
+            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+          </a>
         </div>
       </div>
 
-      <!-- Right Column: Interactive 3D Quadruped Canvas & HUD Overlay -->
+      <!-- Right Column: 3D Simulation Canvas with Kinematic Readouts -->
       <div class="lg:w-7/12 flex flex-col">
-        <div class="relative w-full h-[460px] sm:h-[520px] bg-brand-dark border border-brand-border rounded-xl overflow-hidden shadow-2xl group">
+        <div class="relative w-full h-[460px] sm:h-[520px] bg-brand-dark border border-brand-border rounded-xl overflow-hidden shadow-2xl">
           
-          <!-- WebGL Canvas Container -->
+          <!-- Three.js Container -->
           <div id="three-quadruped-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
 
-          <!-- Interactive HUD Overlay: Sensor Vision Mode -->
-          <div class="absolute top-4 left-4 flex flex-wrap gap-2 z-20">
-            <button id="btn-hud-optical" onclick="setVisionMode('optical')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-cyan text-brand-cyan transition-all hover:bg-brand-cyan/20">
-              [OPTICAL WIRE]
+          <!-- Top-Left Perception & Wireframe Controls -->
+          <div class="absolute top-3 left-3 flex flex-wrap gap-2 z-20">
+            <button id="toggle-vision-cone" onclick="toggleVisionFrustum()" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-card/90 border border-brand-accent text-brand-accent transition hover:bg-brand-accent/20 flex items-center space-x-1">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              <span id="vision-cone-text">CAMERA FOV: ON</span>
             </button>
-            <button id="btn-hud-lidar" onclick="setVisionMode('lidar')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-border text-slate-400 transition-all hover:border-brand-cyan hover:text-white">
-              [LiDAR CLOUD]
-            </button>
-            <button id="btn-hud-thermal" onclick="setVisionMode('thermal')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-border text-slate-400 transition-all hover:border-brand-crimson hover:text-brand-crimson">
-              [THERMAL IR]
+            <button id="toggle-skeleton-mode" onclick="toggleWireframeMode()" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-card/90 border border-brand-border text-slate-300 transition hover:border-brand-accent flex items-center space-x-1">
+              <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+              <span id="skeleton-mode-text">3-DoF LINKS: SOLID</span>
             </button>
           </div>
 
-          <!-- Camera & Orbit Helper Tag -->
-          <div class="absolute top-4 right-4 z-20 text-[10px] font-mono text-slate-400 bg-brand-panel/80 px-2.5 py-1 rounded border border-brand-border backdrop-blur">
-            <span class="text-brand-cyan">&bull; 3D INTERACTIVE:</span> Drag to Orbit | Scroll to Zoom
+          <!-- Top-Right Orbit Guidance -->
+          <div class="absolute top-3 right-3 z-20 text-[10px] font-mono text-slate-400 bg-brand-card/80 px-2.5 py-1 rounded border border-brand-border backdrop-blur">
+            <span class="text-brand-accent">&bull; THREE.JS LAB:</span> Drag to Orbit | Scroll Zoom
           </div>
 
-          <!-- Bottom HUD Gait Controls -->
-          <div class="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 bg-brand-panel/85 border border-brand-border p-3 rounded-lg backdrop-blur">
+          <!-- Dynamic 3-DoF Joint Angle HUD Overlay (Front Left Leg) -->
+          <div class="absolute bottom-16 right-3 z-20 hidden sm:block p-3 bg-brand-card/90 border border-brand-border rounded-lg backdrop-blur font-mono text-[10px] text-slate-300 w-52">
+            <div class="text-brand-accent font-bold mb-1.5 border-b border-brand-border/60 pb-1 flex justify-between">
+              <span>FL 3-DoF JOINT ANGLES</span>
+              <span class="text-brand-amber">IK LIVE</span>
+            </div>
+            <div class="flex justify-between">
+              <span>q1 (Hip Ab/Ad):</span>
+              <span id="hud-q1" class="text-white font-bold">0.00 rad</span>
+            </div>
+            <div class="flex justify-between">
+              <span>q2 (Hip Pitch):</span>
+              <span id="hud-q2" class="text-brand-accent font-bold">+0.52 rad</span>
+            </div>
+            <div class="flex justify-between">
+              <span>q3 (Knee Pitch):</span>
+              <span id="hud-q3" class="text-brand-amber font-bold">-1.05 rad</span>
+            </div>
+          </div>
+
+          <!-- Bottom Gait Controller Toolbar -->
+          <div class="absolute bottom-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 bg-brand-card/90 border border-brand-border p-2.5 rounded-lg backdrop-blur">
             <div class="flex items-center space-x-2">
-              <span class="text-[11px] font-mono text-slate-400">GAIT CTRL:</span>
-              <button id="gait-trot" onclick="setGait('trot')" class="px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition">TROT</button>
-              <button id="gait-crawl" onclick="setGait('crawl')" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-cyan transition">CRAWL</button>
-              <button id="gait-stand" onclick="setGait('stand')" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-cyan transition">STANCE</button>
-              <button id="gait-jump" onclick="triggerAgileLeap()" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-amber/20 border border-brand-amber text-brand-amber hover:bg-brand-amber/30 transition">RECKON</button>
+              <span class="text-[11px] font-mono text-slate-400">GAIT ENGINE:</span>
+              <button id="gait-trot" onclick="setResearchGait('trot')" class="px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-accent text-brand-black transition">TROT</button>
+              <button id="gait-walk" onclick="setResearchGait('walk')" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-accent transition">WALK</button>
+              <button id="gait-stance" onclick="setResearchGait('stance')" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-accent transition">STANCE</button>
+              <button id="gait-wave" onclick="setResearchGait('wave')" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-amber/20 border border-brand-amber text-brand-amber hover:bg-brand-amber/30 transition">PAW / WAVE</button>
             </div>
 
-            <!-- Joint Pitch / Stance Slider -->
-            <div class="flex items-center space-x-2">
-              <span class="text-[11px] font-mono text-slate-400">CHASSIS HEIGHT:</span>
-              <input id="stance-slider" type="range" min="0.8" max="1.5" step="0.05" value="1.15" class="w-24 accent-brand-cyan bg-brand-dark cursor-pointer">
+            <!-- Stance / Base Height Slider -->
+            <div class="flex items-center space-x-2 font-mono text-[11px] text-slate-400">
+              <span>CHASSIS Z:</span>
+              <input id="chassis-z-slider" type="range" min="0.75" max="1.35" step="0.02" value="1.0" class="w-24 accent-brand-accent bg-brand-dark cursor-pointer">
             </div>
           </div>
-
-          <!-- Scanline effect overlay -->
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-brand-cyan/5 to-transparent h-20 w-full animate-scanline opacity-40"></div>
         </div>
 
-        <div class="flex items-center justify-between text-xs font-mono text-slate-500 mt-2 px-1">
-          <span>COORDINATES: LAT 34.0522° N, LON 118.2437° W</span>
-          <span class="text-brand-cyan">TERRAIN ADAPTATION: ACTIVE (CLAY / CRUSHED GRAVEL)</span>
+        <div class="flex items-center justify-between text-xs font-mono text-slate-400 mt-2 px-1">
+          <span>KINEMATIC DEGREE: 12-DoF QDD CLOSED LOOP</span>
+          <span class="text-brand-accent">CONTROLLER: ROS 2 + MICRO-ROS RTOS</span>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- FLEET PRODUCT LINEUP -->
-  <section id="fleet" class="py-24 bg-brand-dark border-b border-brand-border relative">
+  <!-- 3-DoF PER LEG KINEMATICS & MECHANICAL ARCHITECTURE -->
+  <section id="kinematics" class="py-20 bg-brand-dark border-b border-brand-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+      <div class="max-w-3xl mb-14">
+        <span class="text-xs font-mono text-brand-accent tracking-widest uppercase">// LEG MECHANICAL SPECIFICATION</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1 uppercase">3 Degrees of Freedom (3-DoF) Per Leg</h2>
+        <p class="text-slate-400 text-sm mt-2 font-light">
+          Each limb is partitioned into three independent rotational degrees of freedom arranged to maximize workspace volume while concentrating actuator inertia near the chassis trunk.
+        </p>
+      </div>
+
+      <!-- 3 Joints Explanatory Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        
+        <!-- Joint 1: Hip Abduction / Adduction -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6 relative group hover:border-brand-accent transition-colors">
+          <div class="text-[10px] font-mono text-brand-accent bg-brand-accent/10 px-2 py-0.5 rounded inline-block mb-3">
+            JOINT 1 &bull; ROLL AXIS ($q_1$)
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Hip Abduction / Adduction</h3>
+          <p class="text-xs text-slate-300 font-light leading-relaxed">
+            Permits lateral leg splay and active roll stabilization over uneven terrain, trenches, and lateral slope contours. Direct mounted to chassis rail.
+          </p>
+          <div class="mt-4 pt-4 border-t border-brand-border font-mono text-xs text-slate-400 space-y-1.5">
+            <div class="flex justify-between">
+              <span>Joint Motion:</span>
+              <span class="text-white font-semibold">&plusmn;35&deg; (&plusmn;0.61 rad)</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Torque Limit:</span>
+              <span class="text-brand-accent font-semibold">18 Nm Continuous</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Joint 2: Hip Pitch / Thigh -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6 relative group hover:border-brand-accent transition-colors">
+          <div class="text-[10px] font-mono text-brand-amber bg-brand-amber/10 px-2 py-0.5 rounded inline-block mb-3">
+            JOINT 2 &bull; PITCH AXIS ($q_2$)
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Hip Pitch (Thigh Flexion)</h3>
+          <p class="text-xs text-slate-300 font-light leading-relaxed">
+            Drives forward/backward swing phase and vertical stance thrust. Houses the planetary gearbox and upper carbon-composite femur link.
+          </p>
+          <div class="mt-4 pt-4 border-t border-brand-border font-mono text-xs text-slate-400 space-y-1.5">
+            <div class="flex justify-between">
+              <span>Joint Motion:</span>
+              <span class="text-white font-semibold">-45&deg; to +90&deg;</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Link Length ($L_1$):</span>
+              <span class="text-brand-amber font-semibold">210 mm (Femur)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Joint 3: Knee Pitch / Calf -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6 relative group hover:border-brand-accent transition-colors">
+          <div class="text-[10px] font-mono text-brand-emerald bg-brand-emerald/10 px-2 py-0.5 rounded inline-block mb-3">
+            JOINT 3 &bull; KNEE PITCH ($q_3$)
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Knee Pitch (Tibia Extension)</h3>
+          <p class="text-xs text-slate-300 font-light leading-relaxed">
+            Delivers ground strike damping, foot placement height adjustment, and vertical leap kinetics. Actuated via lightweight linkage or concentric belt.
+          </p>
+          <div class="mt-4 pt-4 border-t border-brand-border font-mono text-xs text-slate-400 space-y-1.5">
+            <div class="flex justify-between">
+              <span>Joint Motion:</span>
+              <span class="text-white font-semibold">-140&deg; to -30&deg;</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Link Length ($L_2$):</span>
+              <span class="text-brand-emerald font-semibold">225 mm (Tibia)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Interactive Inverse Kinematics Calculator Playground -->
+      <div class="bg-brand-card border border-brand-border rounded-xl p-6 lg:p-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-brand-border pb-4 mb-6">
+          <div>
+            <span class="text-xs font-mono text-brand-accent">// RESEARCH BENCH</span>
+            <h4 class="text-lg font-bold text-white">Planar Inverse Kinematics (IK) Test Bench</h4>
+          </div>
+          <span class="text-xs font-mono text-slate-400">Target Foot Position $(X, Z) \rightarrow \text{Calculated } (\theta_{\text{hip}}, \theta_{\text{knee}})$</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <!-- Slider Inputs -->
+          <div class="md:col-span-6 space-y-4 font-mono text-xs">
+            <div>
+              <div class="flex justify-between text-slate-300 mb-1">
+                <span>Foot Forward Offset ($X$ mm):</span>
+                <span id="ik-val-x" class="text-brand-accent font-bold">20 mm</span>
+              </div>
+              <input type="range" id="ik-slider-x" min="-120" max="150" value="20" oninput="solveInteractiveIK()" class="w-full h-2 bg-brand-dark rounded accent-brand-accent cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-300 mb-1">
+                <span>Foot Depth ($Z$ mm downwards):</span>
+                <span id="ik-val-z" class="text-brand-accent font-bold">-310 mm</span>
+              </div>
+              <input type="range" id="ik-slider-z" min="-380" max="-180" value="-310" oninput="solveInteractiveIK()" class="w-full h-2 bg-brand-dark rounded accent-brand-accent cursor-pointer">
+            </div>
+
+            <div class="p-3 bg-brand-dark rounded border border-brand-border text-[11px] text-slate-400">
+              <span class="text-brand-accent font-bold">Analytical Law of Cosines:</span>
+              <p class="mt-1 font-mono">
+                $\cos(\theta_3) = \frac{X^2 + Z^2 - L_1^2 - L_2^2}{2 L_1 L_2}$
+              </p>
+            </div>
+          </div>
+
+          <!-- Calculated Output Display -->
+          <div class="md:col-span-6 grid grid-cols-2 gap-3 font-mono">
+            <div class="p-4 bg-brand-dark border border-brand-border rounded-lg text-center">
+              <span class="text-[10px] text-slate-400 block mb-1">CALCULATED THIGH PITCH ($\theta_2$)</span>
+              <span id="ik-res-q2" class="text-xl font-bold text-brand-amber">44.8&deg;</span>
+              <span class="text-[10px] text-slate-500 block mt-1">+0.78 rad</span>
+            </div>
+            <div class="p-4 bg-brand-dark border border-brand-border rounded-lg text-center">
+              <span class="text-[10px] text-slate-400 block mb-1">CALCULATED KNEE PITCH ($\theta_3$)</span>
+              <span id="ik-res-q3" class="text-xl font-bold text-brand-emerald">-93.4&deg;</span>
+              <span class="text-[10px] text-slate-500 block mt-1">-1.63 rad</span>
+            </div>
+            <div class="col-span-2 p-3 bg-brand-dark/50 border border-brand-border rounded flex items-center justify-between text-xs">
+              <span class="text-slate-400">Kinematic Jacobian Singularity:</span>
+              <span class="text-brand-emerald font-semibold">&check; SAFE WORKSPACE INTERIOR</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CAMERA VISION, SEMI-AUTONOMOUS OPERATION & SENSORS -->
+  <section id="perception" class="py-20 bg-brand-black border-b border-brand-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-14">
         <div>
-          <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// DEPLOYMENT-READY ASSETS</span>
-          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase tracking-tight">The HUND Tactical Lineup</h2>
+          <span class="text-xs font-mono text-brand-accent tracking-widest uppercase">// PERCEPTION ARCHITECTURE</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1 uppercase">Vision &amp; Semi-Autonomous Guidance</h2>
         </div>
-        <p class="mt-4 md:mt-0 text-slate-400 text-sm max-w-md">
-          Modular chassis architecture engineered for distinct endurance, payload capacity, and aggressive off-road traversability.
+        <p class="mt-3 md:mt-0 text-slate-400 text-xs sm:text-sm max-w-md font-light">
+          Combining stereoscopic optical depth sensing with a high-framerate IMU to achieve reliable GPS-denied state estimation.
         </p>
       </div>
 
-      <!-- Fleet Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- CARD 1: HUND ALPHA -->
-        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative flex flex-col justify-between hover:border-brand-cyan/60 transition-all duration-300 group">
-          <div class="absolute top-4 right-4">
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-dark border border-brand-border text-slate-400">PATROL &amp; LIGHT RECON</span>
+        <!-- Feature 1: Stereo Depth & Monocular -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6">
+          <div class="w-10 h-10 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-accent mb-4">
+            <i data-lucide="camera" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">Stereo Depth &amp; Camera Vision</h3>
+          <p class="text-xs text-slate-300 font-light mt-2 leading-relaxed">
+            Dual forward-facing global shutter sensors with IR projection compute 3D point cloud disparity maps in real time, detecting obstacles, stair rises, and drop-offs.
+          </p>
+          <div class="mt-4 pt-3 border-t border-brand-border text-slate-400 font-mono text-[11px] space-y-1">
+            <div>&bull; Depth Range: 0.2m &ndash; 6.0m</div>
+            <div>&bull; Optical FOV: 87&deg; &times; 58&deg;</div>
+            <div>&bull; Output: PointCloud2 + Color Streams</div>
+          </div>
+        </div>
+
+        <!-- Feature 2: Semi-Autonomous Navigation -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6">
+          <div class="w-10 h-10 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-amber mb-4">
+            <i data-lucide="navigation" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">Semi-Autonomous Navigation</h3>
+          <p class="text-xs text-slate-300 font-light mt-2 leading-relaxed">
+            Supports waypoint tracking with automatic terrain adaptation. A human operator provides high-level heading vectors, while onboard reactive controllers handle leg balance.
+          </p>
+          <div class="mt-4 pt-3 border-t border-brand-border text-slate-400 font-mono text-[11px] space-y-1">
+            <div>&bull; Teleoperation: 2.4 GHz Low-Latency Bridge</div>
+            <div>&bull; Fail-safe: Auto-stance squat on comms loss</div>
+            <div>&bull; Pathing: Nav2 ROS Costmap2D integration</div>
+          </div>
+        </div>
+
+        <!-- Feature 3: Visual-Inertial Odometry (VIO) -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6">
+          <div class="w-10 h-10 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-emerald mb-4">
+            <i data-lucide="compass" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-base font-bold text-white">9-DoF IMU &amp; Odometry Fusion</h3>
+          <p class="text-xs text-slate-300 font-light mt-2 leading-relaxed">
+            An Extended Kalman Filter (EKF) fuses motor encoder joint states with high-frequency accelerometer/gyro readings and optical feature tracking to prevent drift.
+          </p>
+          <div class="mt-4 pt-3 border-t border-brand-border text-slate-400 font-mono text-[11px] space-y-1">
+            <div>&bull; Sensor Hub: BNO085 9-Axis System</div>
+            <div>&bull; Update Loop: 500 Hz State Estimator</div>
+            <div>&bull; Drift Rate: &lt; 1.5% over 50 meters</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CAPSTONE MILESTONES & TIMELINE -->
+  <section id="timeline" class="py-20 bg-brand-dark border-b border-brand-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="max-w-3xl mb-14">
+        <span class="text-xs font-mono text-brand-accent tracking-widest uppercase">// ACADEMIC ROADMAP</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1 uppercase">Capstone Timeline &amp; Milestones</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-2 font-light">
+          Structured over two senior engineering semesters culminating in the annual College of Engineering Design Symposium.
+        </p>
+      </div>
+
+      <!-- Roadmap Flow -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 font-mono text-xs">
+        
+        <!-- Phase 1 -->
+        <div class="p-5 bg-brand-card border border-brand-border rounded-xl relative">
+          <div class="text-[10px] text-brand-emerald font-bold mb-1">PHASE 01 &bull; COMPLETE</div>
+          <h4 class="text-sm font-bold text-white mb-2">CAD &amp; Kinematics Model</h4>
+          <p class="text-slate-400 text-[11px] font-sans leading-relaxed">
+            Full SolidWorks assembly, mass distribution balancing, 3-DoF leg workspace validation, and Gazebo/MuJoCo physics simulations.
+          </p>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="p-5 bg-brand-card border border-brand-accent/50 rounded-xl relative bg-brand-accent/5">
+          <div class="text-[10px] text-brand-accent font-bold mb-1">PHASE 02 &bull; IN PROGRESS</div>
+          <h4 class="text-sm font-bold text-white mb-2">Fabrication &amp; QDD Testing</h4>
+          <p class="text-slate-400 text-[11px] font-sans leading-relaxed">
+            CNC 7075 aluminum leg brackets, 3D printed carbon-nylon enclosures, and single-leg dynamometer force-torque validation.
+          </p>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="p-5 bg-brand-card border border-brand-border rounded-xl relative">
+          <div class="text-[10px] text-slate-500 font-bold mb-1">PHASE 03 &bull; UPCOMING</div>
+          <h4 class="text-sm font-bold text-white mb-2">Vision SLAM &amp; Trot Gait</h4>
+          <p class="text-slate-400 text-[11px] font-sans leading-relaxed">
+            Integrating stereo cameras, implementing reactive Raibert trot controllers, and closed-loop semi-autonomous obstacle avoidance.
+          </p>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="p-5 bg-brand-card border border-brand-border rounded-xl relative">
+          <div class="text-[10px] text-brand-amber font-bold mb-1">PHASE 04 &bull; CAPSTONE FINALE</div>
+          <h4 class="text-sm font-bold text-white mb-2">Symposium &amp; Field Trials</h4>
+          <p class="text-slate-400 text-[11px] font-sans leading-relaxed">
+            Live untethered multi-terrain demonstration, publishing open-hardware technical whitepaper, and graduation symposium defense.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SPONSORSHIP, DONATION TIERS & CONTACT DIRECT -->
+  <section id="sponsorship" class="py-20 bg-brand-black border-b border-brand-border relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <span class="text-xs font-mono text-brand-amber tracking-widest uppercase">// UNIVERSITY CAPSTONE SUPPORT</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Support Student Robotics Innovation</h2>
+        <p class="text-slate-300 text-sm mt-3 font-light leading-relaxed">
+          Building a research quadruped requires precision machining, brushless quasi-direct drive actuators, lithium polymer power packs, and high-framerate depth vision cameras. We are seeking philanthropic gifts, academic grants, and industry component sponsors.
+        </p>
+      </div>
+
+      <!-- Funding Wishlist & Tiers -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        
+        <!-- Tier 1: Hardware & Machining -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-mono text-slate-400">CHASSIS &amp; FRAME</span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-brand-dark text-slate-300 border border-brand-border">FABRICATION</span>
+            </div>
+            <h3 class="text-xl font-bold text-white">Machining &amp; Structure</h3>
+            <p class="text-xs text-slate-300 mt-2 font-light leading-relaxed">
+              Funds CNC machining of 7075 aluminum hip brackets, waterjet chassis base plates, bearings, carbon-fiber rods, and titanium joint shafts.
+            </p>
+            <div class="mt-6 pt-4 border-t border-brand-border text-xs font-mono text-brand-accent">
+              Goal: $1,200 Component Budget
+            </div>
+          </div>
+          <div class="mt-6">
+            <a href="mailto:timothym.huang@calbaptist.edu?subject=HUND%20Robotics%20Sponsorship%20-%20Machining%20%26%20Frame"
+               class="block text-center py-2.5 px-4 bg-brand-dark hover:border-brand-accent border border-brand-border text-slate-200 text-xs font-mono font-semibold rounded transition">
+              Sponsor Frame &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Tier 2: Actuation & Power (Featured) -->
+        <div class="bg-brand-card border-2 border-brand-amber rounded-xl p-6 flex flex-col justify-between relative shadow-[0_0_25px_rgba(245,158,11,0.12)]">
+          <div class="absolute -top-3 right-6 bg-brand-amber text-brand-black px-2.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider">
+            HIGH PRIORITY NEED
           </div>
           <div>
-            <div class="h-44 w-full bg-brand-dark/80 rounded-lg flex items-center justify-center relative overflow-hidden border border-brand-border mb-6">
-              <!-- SVG Visual Representation -->
-              <svg class="w-32 h-32 text-brand-cyan group-hover:scale-105 transition-transform duration-500" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
-                <!-- Body -->
-                <rect x="25" y="38" width="50" height="22" rx="4" stroke="currentColor" fill="#121824"/>
-                <circle cx="70" cy="48" r="4" fill="#00f0ff" stroke="none" />
-                <path d="M72 44 L80 44" stroke="#00f0ff" />
-                <!-- Legs front -->
-                <path d="M32 60 L24 75 L18 90" stroke-linecap="round"/>
-                <path d="M38 60 L44 75 L38 90" stroke-linecap="round"/>
-                <!-- Legs rear -->
-                <path d="M62 60 L58 75 L62 90" stroke-linecap="round"/>
-                <path d="M68 60 L76 75 L82 90" stroke-linecap="round"/>
-              </svg>
-              <div class="absolute bottom-2 left-3 font-mono text-[10px] text-slate-500">SPEC: HUND-A1</div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-mono text-brand-amber">ACTUATORS &amp; POWER</span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-brand-amber/10 text-brand-amber border border-brand-amber/30">12 ACTUATORS</span>
             </div>
-
-            <h3 class="text-2xl font-bold text-white group-hover:text-brand-cyan transition-colors">HUND ALPHA</h3>
-            <p class="text-xs text-slate-400 mt-2 font-mono">Agile Perimeter &amp; Facility Scout</p>
-            <p class="text-sm text-slate-300 mt-4 leading-relaxed font-light">
-              Lightweight carbon-titanium frame designed for rapid indoor/outdoor autonomous patrolling, thermal inspection, and high stair climbing.
+            <h3 class="text-xl font-bold text-white">QDD Motors &amp; Drivers</h3>
+            <p class="text-xs text-slate-300 mt-2 font-light leading-relaxed">
+              Sponsors brushless planetary quasi-direct drive motors, FOC CAN motor controllers, 24V LiPo batteries, and power distribution boards.
             </p>
-
-            <ul class="mt-6 space-y-2.5 text-xs font-mono border-t border-brand-border pt-5">
-              <li class="flex justify-between text-slate-400">
-                <span>RATING:</span>
-                <span class="text-white font-semibold">IP67 Waterproof</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>ENDURANCE:</span>
-                <span class="text-white font-semibold">3.5 hrs (Hot-swap)</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>PAYLOAD:</span>
-                <span class="text-white font-semibold">14 kg</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>MAX SPEED:</span>
-                <span class="text-white font-semibold">4.8 m/s (17.2 km/h)</span>
-              </li>
-            </ul>
+            <div class="mt-6 pt-4 border-t border-brand-border text-xs font-mono text-brand-amber font-bold">
+              Goal: $2,800 Actuator Fund
+            </div>
           </div>
-
-          <div class="mt-8 pt-4">
-            <button onclick="quickSelectFleet('ALPHA')" class="w-full py-2.5 px-4 bg-brand-dark hover:bg-brand-cyan hover:text-black border border-brand-border hover:border-brand-cyan rounded text-xs font-mono font-bold tracking-wider transition-all">
-              CONFIGURE ALPHA &rarr;
-            </button>
+          <div class="mt-6">
+            <a href="mailto:timothym.huang@calbaptist.edu?subject=HUND%20Robotics%20Sponsorship%20-%20Actuators%20%26%20Power"
+               class="block text-center py-2.5 px-4 bg-brand-amber hover:bg-white text-brand-black text-xs font-mono font-bold rounded transition">
+              Sponsor Actuators &rarr;
+            </a>
           </div>
         </div>
 
-        <!-- CARD 2: HUND APEX (Featured) -->
-        <div class="bg-brand-panel border-2 border-brand-cyan rounded-xl p-6 relative flex flex-col justify-between shadow-[0_0_30px_rgba(0,240,255,0.15)] group">
-          <div class="absolute -top-3.5 right-6 bg-brand-cyan text-brand-black px-3 py-0.5 rounded text-[10px] font-mono font-black tracking-widest">
-            MOST POPULAR
-          </div>
+        <!-- Tier 3: Compute & Vision -->
+        <div class="bg-brand-card border border-brand-border rounded-xl p-6 flex flex-col justify-between">
           <div>
-            <div class="h-44 w-full bg-brand-dark rounded-lg flex items-center justify-center relative overflow-hidden border border-brand-cyan/40 mb-6">
-              <!-- SVG Visual Representation -->
-              <svg class="w-32 h-32 text-white group-hover:scale-105 transition-transform duration-500" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
-                <!-- Reinforced body -->
-                <rect x="22" y="34" width="56" height="26" rx="5" stroke="#00f0ff" fill="#121824"/>
-                <path d="M30 34 L30 26 L50 26 L50 34" stroke="#ffaa00" />
-                <circle cx="74" cy="46" r="5" fill="#00f0ff" />
-                <line x1="28" y1="46" x2="48" y2="46" stroke="#00f0ff" stroke-dasharray="2,2"/>
-                <!-- Heavy Duty Legs -->
-                <path d="M30 60 L20 76 L14 90" stroke-linecap="round" stroke="#00f0ff"/>
-                <path d="M36 60 L44 76 L36 90" stroke-linecap="round" stroke="#00f0ff"/>
-                <path d="M64 60 L58 76 L62 90" stroke-linecap="round" stroke="#00f0ff"/>
-                <path d="M70 60 L80 76 L88 90" stroke-linecap="round" stroke="#00f0ff"/>
-              </svg>
-              <div class="absolute bottom-2 left-3 font-mono text-[10px] text-brand-cyan">SPEC: HUND-X9 APEX</div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs font-mono text-slate-400">VISION &amp; COMPUTE</span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-brand-dark text-slate-300 border border-brand-border">EMBEDDED AI</span>
             </div>
-
-            <h3 class="text-2xl font-bold text-white group-hover:text-brand-cyan transition-colors">HUND APEX</h3>
-            <p class="text-xs text-brand-cyan mt-2 font-mono">Heavy Tactical &amp; CBRN Response</p>
-            <p class="text-sm text-slate-300 mt-4 leading-relaxed font-light">
-              Enterprise workhorse equipped with dual RTK GNSS, 360° LiDAR, and modular high-voltage power bus for tactical arm manipulators and gas analysis.
+            <h3 class="text-xl font-bold text-white">Stereo Vision &amp; SBC</h3>
+            <p class="text-xs text-slate-300 mt-2 font-light leading-relaxed">
+              Provides the high-resolution global shutter stereo cameras, Jetson/Raspberry Pi embedded SBC, 9-DoF IMU, and wireless telemetry radios.
             </p>
-
-            <ul class="mt-6 space-y-2.5 text-xs font-mono border-t border-brand-border pt-5">
-              <li class="flex justify-between text-slate-400">
-                <span>RATING:</span>
-                <span class="text-white font-semibold">IP67 + Submersible</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>ENDURANCE:</span>
-                <span class="text-white font-semibold">5.0 hrs Operational</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>PAYLOAD:</span>
-                <span class="text-brand-cyan font-bold">35 kg</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>COMPUTE:</span>
-                <span class="text-white font-semibold">275 TOPS Neural Box</span>
-              </li>
-            </ul>
+            <div class="mt-6 pt-4 border-t border-brand-border text-xs font-mono text-brand-accent">
+              Goal: $950 Sensor Budget
+            </div>
           </div>
-
-          <div class="mt-8 pt-4">
-            <button onclick="quickSelectFleet('APEX')" class="w-full py-2.5 px-4 bg-brand-cyan text-brand-black hover:bg-white rounded text-xs font-mono font-bold tracking-wider transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)]">
-              CONFIGURE APEX &rarr;
-            </button>
+          <div class="mt-6">
+            <a href="mailto:timothym.huang@calbaptist.edu?subject=HUND%20Robotics%20Sponsorship%20-%20Vision%20%26%20Compute"
+               class="block text-center py-2.5 px-4 bg-brand-dark hover:border-brand-accent border border-brand-border text-slate-200 text-xs font-mono font-semibold rounded transition">
+              Sponsor Vision &rarr;
+            </a>
           </div>
         </div>
 
-        <!-- CARD 3: HUND CERBERUS -->
-        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative flex flex-col justify-between hover:border-brand-crimson/70 transition-all duration-300 group">
-          <div class="absolute top-4 right-4">
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-dark border border-brand-crimson/40 text-brand-crimson">MIL / HEAVY LOGISTICS</span>
-          </div>
-          <div>
-            <div class="h-44 w-full bg-brand-dark/80 rounded-lg flex items-center justify-center relative overflow-hidden border border-brand-border mb-6">
-              <!-- SVG Visual Representation -->
-              <svg class="w-32 h-32 text-slate-400 group-hover:text-brand-crimson group-hover:scale-105 transition-transform duration-500" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.2">
-                <!-- Armored body -->
-                <polygon points="18,36 82,36 76,64 24,64" stroke="currentColor" fill="#121824"/>
-                <line x1="20" y1="44" x2="80" y2="44" stroke="currentColor"/>
-                <circle cx="75" cy="50" r="4" fill="#ff003c" stroke="none" />
-                <!-- Heavy Plated Limbs -->
-                <path d="M26 64 L16 80 L12 92" stroke-linecap="round"/>
-                <path d="M34 64 L42 80 L36 92" stroke-linecap="round"/>
-                <path d="M66 64 L60 80 L64 92" stroke-linecap="round"/>
-                <path d="M74 64 L84 80 L90 92" stroke-linecap="round"/>
-              </svg>
-              <div class="absolute bottom-2 left-3 font-mono text-[10px] text-slate-500">SPEC: HUND-C9 CERBERUS</div>
-            </div>
+      </div>
 
-            <h3 class="text-2xl font-bold text-white group-hover:text-brand-crimson transition-colors">HUND CERBERUS</h3>
-            <p class="text-xs text-brand-crimson mt-2 font-mono">Ultra-Heavy Industrial Carrier</p>
-            <p class="text-sm text-slate-300 mt-4 leading-relaxed font-light">
-              Maximum torque multi-stage harmonic actuators designed for munitions logistics, underground subterranean tunnel exploration, and extreme cold (-40°C).
+      <!-- DIRECT CONTACT CALLOUT (Strict requirement: Direct email, no email input field) -->
+      <div class="bg-brand-card border border-brand-border rounded-xl p-8 max-w-4xl mx-auto shadow-xl">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          
+          <div class="space-y-2">
+            <div class="inline-flex items-center space-x-2 text-brand-amber font-mono text-xs">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>OFFICIAL CAPSTONE CORRESPONDENCE</span>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-bold text-white">Interested in Mentoring or Donating?</h3>
+            <p class="text-slate-300 text-xs sm:text-sm font-light max-w-xl">
+              Donations may qualify for tax-deductible educational gift status through university capstone departmental accounts. Please email lead student researcher <strong>Timothy Huang</strong> directly to connect.
             </p>
-
-            <ul class="mt-6 space-y-2.5 text-xs font-mono border-t border-brand-border pt-5">
-              <li class="flex justify-between text-slate-400">
-                <span>ARMOR:</span>
-                <span class="text-white font-semibold">Ballistic Kevlar Core</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>PAYLOAD:</span>
-                <span class="text-brand-crimson font-bold">60 kg Max</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>TEMP RANGE:</span>
-                <span class="text-white font-semibold">-40°C to +65°C</span>
-              </li>
-              <li class="flex justify-between text-slate-400">
-                <span>COMMS:</span>
-                <span class="text-white font-semibold">COFDM MESH + Satcom</span>
-              </li>
-            </ul>
           </div>
 
-          <div class="mt-8 pt-4">
-            <button onclick="quickSelectFleet('CERBERUS')" class="w-full py-2.5 px-4 bg-brand-dark hover:bg-brand-crimson hover:text-white border border-brand-border hover:border-brand-crimson rounded text-xs font-mono font-bold tracking-wider transition-all">
-              CONFIGURE CERBERUS &rarr;
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- MISSION CONTROL TELEMETRY SANDBOX -->
-  <section id="telemetry" class="py-24 bg-brand-black border-b border-brand-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="mb-12">
-        <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// TACTICAL FLIGHT DECK</span>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Live Autonomous Mission Sandbox</h2>
-        <p class="text-slate-400 text-sm mt-2">
-          Monitor synthetic unit #H-804 streaming over high-bandwidth encrypted mesh telemetry. Test remote commands in real-time.
-        </p>
-      </div>
-
-      <!-- Telemetry Dashboard Container -->
-      <div class="bg-brand-panel border border-brand-border rounded-xl overflow-hidden shadow-2xl">
-        
-        <!-- Top Status Bar -->
-        <div class="bg-brand-dark px-6 py-3 border-b border-brand-border flex flex-wrap items-center justify-between text-xs font-mono gap-4">
-          <div class="flex items-center space-x-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-brand-emerald animate-pulse"></span>
-            <span class="font-bold text-white">UNIT: APEX-DELTA-04</span>
-            <span class="text-slate-500">|</span>
-            <span class="text-slate-400">FIRMWARE: v6.4.12-PROD</span>
-          </div>
-
-          <div class="flex items-center space-x-6 text-slate-400">
-            <div>SIGNAL: <span class="text-brand-cyan font-bold">-62 dBm (MESH)</span></div>
-            <div>LATENCY: <span id="tele-ping" class="text-brand-emerald font-bold">14 ms</span></div>
-            <div>BATTERY: <span id="tele-battery" class="text-brand-emerald font-bold">88%</span></div>
-          </div>
-        </div>
-
-        <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <!-- Column 1: Joint Torque & Thermal Radar (5 Cols) -->
-          <div class="lg:col-span-4 space-y-4">
-            <h4 class="text-xs font-mono text-slate-400 tracking-wider">JOINT THERMAL DISPERSION</h4>
-            
-            <div class="space-y-3 font-mono text-xs">
-              <div>
-                <div class="flex justify-between text-slate-400 mb-1">
-                  <span>FRONT LEFT ACTUATOR (FL-1)</span>
-                  <span id="temp-fl" class="text-brand-cyan">38.4°C / 42 Nm</span>
-                </div>
-                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
-                  <div id="bar-temp-fl" class="bg-brand-cyan h-full rounded-full transition-all duration-300" style="width: 42%"></div>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex justify-between text-slate-400 mb-1">
-                  <span>FRONT RIGHT ACTUATOR (FR-1)</span>
-                  <span id="temp-fr" class="text-brand-cyan">39.1°C / 45 Nm</span>
-                </div>
-                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
-                  <div id="bar-temp-fr" class="bg-brand-cyan h-full rounded-full transition-all duration-300" style="width: 45%"></div>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex justify-between text-slate-400 mb-1">
-                  <span>REAR LEFT ACTUATOR (RL-2)</span>
-                  <span id="temp-rl" class="text-brand-amber">44.8°C / 58 Nm</span>
-                </div>
-                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
-                  <div id="bar-temp-rl" class="bg-brand-amber h-full rounded-full transition-all duration-300" style="width: 58%"></div>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex justify-between text-slate-400 mb-1">
-                  <span>REAR RIGHT ACTUATOR (RR-2)</span>
-                  <span id="temp-rr" class="text-brand-cyan">37.9°C / 40 Nm</span>
-                </div>
-                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
-                  <div id="bar-temp-rr" class="bg-brand-cyan h-full rounded-full transition-all duration-300" style="width: 40%"></div>
-                </div>
-              </div>
+          <div class="flex-shrink-0">
+            <a href="mailto:timothym.huang@calbaptist.edu?subject=HUND%20Robotics%20Capstone%20Donation%20%2F%20Inquiry"
+               class="px-6 py-3.5 bg-brand-accent hover:bg-white text-brand-black text-xs font-mono font-bold tracking-wider rounded-lg transition-all shadow-[0_0_20px_rgba(56,189,248,0.3)] inline-flex items-center space-x-2">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span>EMAIL TIMOTHY HUANG</span>
+            </a>
+            <div class="text-[11px] font-mono text-slate-400 mt-2 text-center select-all">
+              timothym.huang@calbaptist.edu
             </div>
-
-            <!-- Pitch / Roll Attitude indicator -->
-            <div class="p-3 bg-brand-dark border border-brand-border rounded font-mono text-xs mt-4">
-              <div class="text-slate-400 mb-2 flex items-center justify-between">
-                <span>IMU ATTITUDE ANGLES</span>
-                <span class="text-brand-cyan">6-AXIS GYRO</span>
-              </div>
-              <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="p-2 bg-brand-panel rounded">
-                  <div class="text-[10px] text-slate-500">PITCH</div>
-                  <div id="tele-pitch" class="text-sm font-bold text-white">+1.4°</div>
-                </div>
-                <div class="p-2 bg-brand-panel rounded">
-                  <div class="text-[10px] text-slate-500">ROLL</div>
-                  <div id="tele-roll" class="text-sm font-bold text-white">-0.8°</div>
-                </div>
-                <div class="p-2 bg-brand-panel rounded">
-                  <div class="text-[10px] text-slate-500">YAW</div>
-                  <div id="tele-yaw" class="text-sm font-bold text-brand-cyan">184.2°</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Column 2: 2D Tactical LiDAR Map Simulation (5 Cols) -->
-          <div class="lg:col-span-5 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-2 font-mono text-xs text-slate-400">
-                <span>SLAM POINT CLOUD RADAR</span>
-                <span class="text-brand-emerald">360° RANGE: 30m</span>
-              </div>
-              <div class="relative w-full aspect-square max-h-[260px] bg-brand-dark border border-brand-border rounded-lg overflow-hidden flex items-center justify-center">
-                <canvas id="lidar-radar-canvas" width="300" height="300" class="w-full h-full"></canvas>
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div class="w-2 h-2 rounded-full bg-brand-cyan glow-cyan-sm"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Waypoint Mission Actions -->
-            <div class="mt-4 flex items-center gap-2">
-              <button onclick="simulateMissionCommand('RETURN_HOME')" class="flex-1 py-2 text-xs font-mono bg-brand-dark hover:border-brand-cyan border border-brand-border text-slate-300 rounded transition">
-                RTL (RETURN TO BASE)
-              </button>
-              <button onclick="simulateMissionCommand('EMERGENCY_STOP')" class="px-4 py-2 text-xs font-mono bg-brand-crimson/20 border border-brand-crimson text-brand-crimson hover:bg-brand-crimson/30 rounded font-bold transition">
-                E-STOP
-              </button>
-            </div>
-          </div>
-
-          <!-- Column 3: Live Event Console Log (3 Cols) -->
-          <div class="lg:col-span-3 flex flex-col">
-            <h4 class="text-xs font-mono text-slate-400 tracking-wider mb-2">EVENT LOG BUS</h4>
-            <div id="telemetry-log-box" class="h-[260px] bg-brand-dark border border-brand-border rounded p-2.5 font-mono text-[11px] overflow-y-auto space-y-1.5 text-slate-400 flex flex-col-reverse">
-              <!-- Dynamically populated -->
-              <div><span class="text-brand-emerald">[OK]</span> Unit heartbeat acknowledged</div>
-              <div><span class="text-brand-cyan">[IMU]</span> Zero drift calibrated</div>
-              <div><span class="text-slate-500">[SYS]</span> Mesh route optimized via node #03</div>
-            </div>
-            
-            <div class="mt-3">
-              <button onclick="injectSimObstacle()" class="w-full py-1.5 text-[11px] font-mono bg-brand-panel hover:bg-brand-border border border-brand-border text-brand-cyan rounded transition">
-                + INJECT SYNTHETIC HAZARD
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- MODULAR PAYLOAD INTEGRATION SYSTEM -->
-  <section id="payloads" class="py-24 bg-brand-dark border-b border-brand-border relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// PLUG &amp; PLAY AVIONICS</span>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Modular Mission Payloads</h2>
-        <p class="text-slate-400 text-sm mt-3 leading-relaxed">
-          The HUND Universal Rail provides NATO-spec picatinny locks, waterproof Gigabit Ethernet, CAN-bus, and 48V/20A continuous regulated power.
-        </p>
-      </div>
-
-      <!-- Payload Selector Tabs & Interactive Display -->
-      <div class="bg-brand-panel border border-brand-border rounded-xl p-6 lg:p-8">
-        
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          <button onclick="switchPayload('arm')" id="tab-arm" class="payload-tab active py-3 px-4 rounded-lg bg-brand-cyan text-brand-black font-mono text-xs font-bold transition flex items-center justify-center space-x-2">
-            <i data-lucide="crosshair" class="w-4 h-4"></i>
-            <span>6-DOF ROBOTIC ARM</span>
-          </button>
-          
-          <button onclick="switchPayload('lidar')" id="tab-lidar" class="payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2">
-            <i data-lucide="scan" class="w-4 h-4"></i>
-            <span>360° LIDAR TOWER</span>
-          </button>
-
-          <button onclick="switchPayload('cbrn')" id="tab-cbrn" class="payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2">
-            <i data-lucide="biohazard" class="w-4 h-4"></i>
-            <span>CBRN GAS SENSOR</span>
-          </button>
-
-          <button onclick="switchPayload('ptz')" id="tab-ptz" class="payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2">
-            <i data-lucide="camera" class="w-4 h-4"></i>
-            <span>LONG-RANGE PTZ CAM</span>
-          </button>
-        </div>
-
-        <!-- Payload Detailed View -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          <div class="lg:col-span-5 bg-brand-dark rounded-xl p-6 border border-brand-border relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
-            <div id="payload-diagram" class="w-full flex items-center justify-center text-brand-cyan">
-              <!-- Visualized via Dynamic SVG/Text in JS -->
-              <svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
-                <circle cx="50" cy="50" r="38" stroke-dasharray="4,4" class="text-brand-border" />
-                <path d="M50 20 L50 45 L70 65" stroke-linecap="round" stroke-width="3" stroke="#00f0ff"/>
-                <circle cx="50" cy="20" r="5" fill="#00f0ff"/>
-                <circle cx="70" cy="65" r="4" fill="#ffaa00"/>
-                <path d="M68 62 L78 54" stroke="#ffaa00" stroke-linecap="round"/>
-                <path d="M72 68 L82 60" stroke="#ffaa00" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="absolute bottom-3 left-4 font-mono text-[11px] text-slate-500">
-              MOUNT: TOP UNIVERSAL RAIL [ISO 9409-1]
-            </div>
-          </div>
-
-          <div class="lg:col-span-7 space-y-4">
-            <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded bg-brand-dark border border-brand-border text-[11px] font-mono text-brand-cyan">
-              <span id="payload-code">SYS-MOD-ARM06</span>
-            </div>
-
-            <h3 id="payload-title" class="text-2xl sm:text-3xl font-bold text-white uppercase">
-              H-ARM6 Tactile Manipulator
-            </h3>
-
-            <p id="payload-desc" class="text-slate-300 text-sm leading-relaxed font-light">
-              Equipped with 6 degrees of freedom, continuous wrist rotation, and force-torque feedback sensors. Capable of door breach manipulation, valve turns in high-radiation zones, and sample gathering.
-            </p>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-brand-border font-mono">
-              <div>
-                <span class="text-[10px] text-slate-500 block">REACH</span>
-                <span id="payload-stat1" class="text-base font-bold text-white">920 mm</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-slate-500 block">LIFT CAPACITY</span>
-                <span id="payload-stat2" class="text-base font-bold text-brand-cyan">6.5 kg (Extended)</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-slate-500 block">INTERFACE</span>
-                <span id="payload-stat3" class="text-base font-bold text-white">CANopen / ROS2</span>
-              </div>
-            </div>
-
-            <div class="pt-4 flex items-center space-x-4">
-              <a href="#calculator" class="px-5 py-2.5 bg-brand-cyan text-brand-black text-xs font-mono font-bold rounded hover:bg-white transition-all">
-                ADD TO FLEET SPEC
-              </a>
-              <span class="text-xs font-mono text-slate-500">Tool-less installation (&lt; 90 seconds)</span>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- INDUSTRY SOLUTIONS -->
-  <section id="solutions" class="py-24 bg-brand-black border-b border-brand-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
-        <div>
-          <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// HIGH CONCAVITY ENVIRONMENTS</span>
-          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Engineered for the Extremes</h2>
-        </div>
-        <p class="mt-4 md:mt-0 text-slate-400 text-sm max-w-md">
-          Where wheels get trapped and tracks snap, quadruped bio-mimetic kinetics step seamlessly across the terrain.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <!-- Defense & Perimeter Security -->
-        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative overflow-hidden group hover:border-brand-cyan transition-colors">
-          <div class="w-12 h-12 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-cyan mb-6 group-hover:border-brand-cyan transition-colors">
-            <i data-lucide="shield-check" class="w-6 h-6"></i>
-          </div>
-          <h3 class="text-xl font-bold text-white group-hover:text-brand-cyan transition-colors">Defense &amp; Base Security</h3>
-          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
-            Persistent autonomous perimeter watch, hostile intruder tracking, acoustic gunshot triangulation, and silent reconnaissance in dark terrain.
-          </p>
-          <ul class="mt-6 space-y-2 text-xs font-mono text-slate-400">
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-cyan">&rsaquo;</span>
-              <span>Encrypted AES-256 Mesh Comms</span>
-            </li>
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-cyan">&rsaquo;</span>
-              <span>Autonomous Docking &amp; Inductive Charging</span>
-            </li>
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-cyan">&rsaquo;</span>
-              <span>FLIR Long-Wave IR Detection</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Oil, Gas & Hazardous Utilities -->
-        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative overflow-hidden group hover:border-brand-cyan transition-colors">
-          <div class="w-12 h-12 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-amber mb-6 group-hover:border-brand-amber transition-colors">
-            <i data-lucide="flame" class="w-6 h-6"></i>
-          </div>
-          <h3 class="text-xl font-bold text-white group-hover:text-brand-amber transition-colors">Energy &amp; Chemical Plants</h3>
-          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
-            Routine thermal inspection of steam pipelines, acoustic detection of gas leaks, and ATEX Zone certified hazardous inspection.
-          </p>
-          <ul class="mt-6 space-y-2 text-xs font-mono text-slate-400">
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-amber">&rsaquo;</span>
-              <span>Methane &amp; VOC Spectrometry</span>
-            </li>
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-amber">&rsaquo;</span>
-              <span>Gauge Reading OCR Automation</span>
-            </li>
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-amber">&rsaquo;</span>
-              <span>Stair &amp; Grating Navigation</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Subterranean & Disaster Response -->
-        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative overflow-hidden group hover:border-brand-cyan transition-colors">
-          <div class="w-12 h-12 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-emerald mb-6 group-hover:border-brand-emerald transition-colors">
-            <i data-lucide="mountain" class="w-6 h-6"></i>
-          </div>
-          <h3 class="text-xl font-bold text-white group-hover:text-brand-emerald transition-colors">Mining &amp; Search / Rescue</h3>
-          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
-            Unexplored underground drift mapping, collapsed structural inspection, and zero-visibility smoke navigation with millimeter-wave radar.
-          </p>
-          <ul class="mt-6 space-y-2 text-xs font-mono text-slate-400">
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-emerald">&rsaquo;</span>
-              <span>GPS-Denied 3D SLAM Mesh</span>
-            </li>
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-emerald">&rsaquo;</span>
-              <span>Two-way audio distress intercom</span>
-            </li>
-            <li class="flex items-center space-x-2">
-              <span class="text-brand-emerald">&rsaquo;</span>
-              <span>Deep Mud &amp; Boulder Scrambling</span>
-            </li>
-          </ul>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- INTERACTIVE FLEET DEPLOYMENT CALCULATOR -->
-  <section id="calculator" class="py-24 bg-brand-dark border-b border-brand-border relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// ENTERPRISE ESTIMATION TOOL</span>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Configure Your Autonomous Fleet</h2>
-        <p class="text-slate-400 text-sm mt-3">
-          Select chassis models, mission modules, autonomous docking docks, and defense SLAs for an immediate deployment estimate.
-        </p>
-      </div>
-
-      <div class="bg-brand-panel border border-brand-border rounded-xl p-6 lg:p-10 shadow-2xl">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
-          <!-- Controls Column (7 Cols) -->
-          <div class="lg:col-span-7 space-y-6">
-            
-            <!-- Select Model -->
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">1. Select Chassis Platform</label>
-              <div class="grid grid-cols-3 gap-3">
-                <button type="button" onclick="calcSelectPlatform('ALPHA', 42000)" id="calc-model-ALPHA" class="calc-btn p-3 rounded bg-brand-dark border border-brand-border text-left hover:border-brand-cyan transition">
-                  <div class="text-xs font-bold text-white font-mono">HUND ALPHA</div>
-                  <div class="text-[11px] text-slate-400 font-mono mt-1">$42,000 / unit</div>
-                </button>
-                <button type="button" onclick="calcSelectPlatform('APEX', 78000)" id="calc-model-APEX" class="calc-btn p-3 rounded bg-brand-cyan/15 border-2 border-brand-cyan text-left transition">
-                  <div class="text-xs font-bold text-brand-cyan font-mono">HUND APEX</div>
-                  <div class="text-[11px] text-slate-300 font-mono mt-1">$78,000 / unit</div>
-                </button>
-                <button type="button" onclick="calcSelectPlatform('CERBERUS', 115000)" id="calc-model-CERBERUS" class="calc-btn p-3 rounded bg-brand-dark border border-brand-border text-left hover:border-brand-cyan transition">
-                  <div class="text-xs font-bold text-white font-mono">CERBERUS</div>
-                  <div class="text-[11px] text-slate-400 font-mono mt-1">$115,000 / unit</div>
-                </button>
-              </div>
-            </div>
-
-            <!-- Fleet Size Slider -->
-            <div>
-              <div class="flex justify-between items-center text-xs font-mono text-slate-400 mb-2">
-                <span>2. FLEET UNIT COUNT</span>
-                <span id="calc-qty-label" class="text-brand-cyan font-bold text-base">3 Units</span>
-              </div>
-              <input id="calc-quantity" type="range" min="1" max="25" value="3" oninput="updateCalculation()" class="w-full h-2 bg-brand-dark rounded-lg accent-brand-cyan cursor-pointer">
-              <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
-                <span>1 Unit (Evaluation)</span>
-                <span>10 Units (Squadron)</span>
-                <span>25 Units (Battalion)</span>
-              </div>
-            </div>
-
-            <!-- Add-on Payloads -->
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">3. Modular Mission Kits</label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
-                
-                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
-                  <input type="checkbox" id="addon-arm" onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
-                  <div>
-                    <span class="text-slate-200 block">6-DOF Manipulator Arm</span>
-                    <span class="text-[10px] text-slate-400">+$18,500 / unit</span>
-                  </div>
-                </label>
-
-                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
-                  <input type="checkbox" id="addon-dock" checked onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
-                  <div>
-                    <span class="text-slate-200 block">Autonomous Weatherproof Dock</span>
-                    <span class="text-[10px] text-slate-400">+$12,000 / unit</span>
-                  </div>
-                </label>
-
-                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
-                  <input type="checkbox" id="addon-lidar" checked onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
-                  <div>
-                    <span class="text-slate-200 block">Ouster 128-Beam LiDAR</span>
-                    <span class="text-[10px] text-slate-400">+$14,200 / unit</span>
-                  </div>
-                </label>
-
-                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
-                  <input type="checkbox" id="addon-cbrn" onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
-                  <div>
-                    <span class="text-slate-200 block">CBRN Sniffer Array</span>
-                    <span class="text-[10px] text-slate-400">+$9,500 / unit</span>
-                  </div>
-                </label>
-
-              </div>
-            </div>
-
-            <!-- Software / SLA -->
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">4. Autonomy &amp; Mission Control Suite</label>
-              <select id="calc-software" onchange="updateCalculation()" class="w-full bg-brand-dark border border-brand-border rounded p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-brand-cyan">
-                <option value="9000">HUND FleetOS Core (Standard SLAM + Tele-op) - $9,000 / yr</option>
-                <option value="22000" selected>HUND Defense Swarm AI (Autonomous Patrol + Mesh Handover) - $22,000 / yr</option>
-                <option value="45000">HUND Tactical Enterprise (Full ROS2 Stack + Air-gapped Defense SLA) - $45,000 / yr</option>
-              </select>
-            </div>
-
-          </div>
-
-          <!-- Summary & Quote Output Column (5 Cols) -->
-          <div class="lg:col-span-5 bg-brand-dark border border-brand-border rounded-xl p-6 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between border-b border-brand-border pb-4 mb-4">
-                <span class="font-mono text-xs text-slate-400 uppercase">ENTERPRISE CONFIGURATION SUMMARY</span>
-                <span class="w-2 h-2 rounded-full bg-brand-cyan"></span>
-              </div>
-
-              <div class="space-y-3 font-mono text-xs text-slate-300">
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Base Unit Model:</span>
-                  <span id="summary-model" class="text-white font-bold">HUND APEX ($78,000)</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Unit Quantity:</span>
-                  <span id="summary-qty" class="text-white">3 Units</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Hardware Subtotal:</span>
-                  <span id="summary-hw-total" class="text-brand-cyan">$312,600</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Software &amp; Swarm SLA:</span>
-                  <span id="summary-sw-total" class="text-slate-200">$22,000 / yr</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-400">Estimated Delivery:</span>
-                  <span class="text-brand-emerald">3 - 5 Weeks</span>
-                </div>
-              </div>
-
-              <!-- Estimated Total Box -->
-              <div class="mt-8 p-4 bg-brand-panel border border-brand-cyan/40 rounded-lg">
-                <div class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Estimated Investment (Year 1)</div>
-                <div id="summary-grand-total" class="text-3xl font-extrabold font-mono text-white mt-1 text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-white">
-                  $334,600
-                </div>
-                <div class="text-[10px] font-mono text-slate-500 mt-1">Excludes local defense tariffs &amp; on-site training.</div>
-              </div>
-            </div>
-
-            <!-- Submission Form Trigger -->
-            <div class="mt-8">
-              <div class="space-y-3">
-                <input id="rfq-email" type="email" placeholder="official@defense.gov or corporate email" class="w-full bg-brand-panel border border-brand-border rounded p-3 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-cyan">
-                <button type="button" onclick="handleQuoteSubmit()" class="w-full py-3 bg-brand-cyan text-brand-black text-xs font-mono font-bold tracking-widest uppercase rounded hover:bg-white transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)]">
-                  TRANSMIT OFFICIAL RFQ &rarr;
-                </button>
-              </div>
-              <div id="rfq-notification" class="hidden mt-3 p-2 bg-brand-emerald/10 border border-brand-emerald rounded text-center text-xs font-mono text-brand-emerald">
-                &check; RFQ Encrypted &amp; Dispatched to Mission Engineering.
-              </div>
-            </div>
-
           </div>
 
         </div>
@@ -957,49 +636,46 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-brand-black border-t border-brand-border py-12 text-slate-500 text-xs font-mono">
+  <footer class="bg-brand-black border-t border-brand-border py-12 text-slate-400 text-xs font-mono">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center space-x-3">
-          <div class="w-7 h-7 bg-brand-panel border border-brand-border rounded flex items-center justify-center text-brand-cyan font-bold">H</div>
-          <span class="text-white font-bold tracking-wider">HUND ROBOTICS INC.</span>
-          <span>&copy; 2026. All rights reserved.</span>
+          <div class="w-8 h-8 bg-brand-card border border-brand-border rounded flex items-center justify-center text-brand-accent font-bold">H</div>
+          <div>
+            <div class="text-white font-bold tracking-wide">HUND ROBOTICS &bull; CAPSTONE 2026</div>
+            <div class="text-[10px] text-slate-400">California Baptist University | College of Engineering</div>
+          </div>
         </div>
-        <div class="flex flex-wrap gap-6 text-slate-400">
-          <a href="#" class="hover:text-brand-cyan transition">MIL-STD-810H</a>
-          <a href="#" class="hover:text-brand-cyan transition">ITAR Compliant</a>
-          <a href="#" class="hover:text-brand-cyan transition">Security Whitepaper</a>
-          <a href="#" class="hover:text-brand-cyan transition">Terms of Autonomy</a>
+        <div class="text-center md:text-right">
+          <div class="text-slate-300">Direct Inquiries: <a href="mailto:timothym.huang@calbaptist.edu" class="text-brand-accent hover:underline">timothym.huang@calbaptist.edu</a></div>
+          <div class="text-[10px] text-slate-400 mt-1">Riverside, California &bull; Senior Engineering Capstone</div>
         </div>
       </div>
-      <div class="mt-6 pt-6 border-t border-brand-border/40 text-[10px] text-slate-600 flex justify-between flex-wrap gap-2">
-        <span>Designed for extreme robotics operations. Export Control Notice: Autonomous systems may require state authorization.</span>
-        <span>LAT: 33.9533° N, LON: 117.3962° W</span>
+      <div class="mt-8 pt-6 border-t border-brand-border/40 text-[10px] text-slate-400 flex flex-wrap justify-between gap-2">
+        <span>Designed &amp; Developed for Academic Research. Open 3-DoF Legged Kinematics.</span>
+        <span>ROS 2 Humble &bull; Micro-ROS &bull; SolidWorks CAD &bull; FreeRTOS</span>
       </div>
     </div>
   </footer>
 
   <script>
     /* ==========================================================================
-       THREE.JS PROCEDURAL QUADRUPED ROBOT SIMULATOR
+       THREE.JS RESEARCH QUADRUPED SIMULATOR (12-DoF / 3-DoF Per Leg)
        ========================================================================== */
-    let scene, camera, renderer, quadrupedGroup;
-    let legs = [];
+    let scene, camera, renderer, quadrupedRoot;
     let clock = new THREE.Clock();
-    let currentGait = 'trot'; // 'trot', 'crawl', 'stand', 'leap'
-    let currentVision = 'optical'; // 'optical', 'lidar', 'thermal'
-    let baseHeight = 1.15;
-    let gaitSpeed = 5.0;
-    let isLeaping = false;
-    let leapTimer = 0;
+    let currentGait = 'trot';
+    let baseHeight = 1.0;
+    let showVisionFrustum = true;
+    let isWireframeMode = false;
+    let visionFrustumMesh;
 
-    // Materials dictionary for sensor views
-    let robotMaterials = {
-      chassis: null,
-      joints: null,
-      accents: null,
-      groundGrid: null
-    };
+    // Leg references for 3-DoF joint rotation manipulation
+    // Each leg has: { abAdHip, hipPitch, kneePitch, phase, baseX, baseZ }
+    let legAssemblies = [];
+
+    // Materials
+    let matChassis, matAbAdBracket, matThigh, matCalf, matFoot, matCameraVision;
 
     function init3DSimulator() {
       const container = document.getElementById('three-quadruped-container');
@@ -1008,17 +684,17 @@
       const width = container.clientWidth;
       const height = container.clientHeight;
 
-      // 1. Scene setup
+      // 1. Scene
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0a0e17);
-      scene.fog = new THREE.FogExp2(0x0a0e17, 0.045);
+      scene.background = new THREE.Color(0x0a101d);
+      scene.fog = new THREE.FogExp2(0x0a101d, 0.05);
 
-      // 2. Camera setup
+      // 2. Camera
       camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-      camera.position.set(3.5, 2.5, 4.5);
-      camera.lookAt(0, 0.6, 0);
+      camera.position.set(2.8, 2.0, 3.4);
+      camera.lookAt(0, 0.5, 0);
 
-      // 3. Renderer setup
+      // 3. Renderer
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -1026,363 +702,340 @@
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       container.appendChild(renderer.domElement);
 
-      // 4. Lights
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
+      // 4. Lighting
+      const ambLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambLight);
 
-      const mainLight = new THREE.DirectionalLight(0x00f0ff, 1.8);
-      mainLight.position.set(5, 8, 5);
-      mainLight.castShadow = true;
-      mainLight.shadow.mapSize.width = 1024;
-      mainLight.shadow.mapSize.height = 1024;
-      scene.add(mainLight);
+      const keyLight = new THREE.DirectionalLight(0x38bdf8, 1.6);
+      keyLight.position.set(4, 6, 4);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 1024;
+      keyLight.shadow.mapSize.height = 1024;
+      scene.add(keyLight);
 
-      const fillLight = new THREE.DirectionalLight(0xff0055, 0.8);
-      fillLight.position.set(-5, 3, -5);
-      scene.add(fillLight);
+      const fillAmberLight = new THREE.DirectionalLight(0xf59e0b, 0.8);
+      fillAmberLight.position.set(-4, 3, -4);
+      scene.add(fillAmberLight);
 
-      // 5. Ground Tech Grid
-      const gridHelper = new THREE.GridHelper(30, 60, 0x00f0ff, 0x1f293d);
-      gridHelper.position.y = 0;
-      scene.add(gridHelper);
+      // 5. Ground Grid
+      const grid = new THREE.GridHelper(24, 48, 0x38bdf8, 0x1e2e48);
+      grid.position.y = 0;
+      scene.add(grid);
 
-      // Ground plane for shadow
-      const groundGeo = new THREE.PlaneGeometry(50, 50);
-      const groundMat = new THREE.MeshStandardMaterial({
-        color: 0x07090e,
-        roughness: 0.8,
-        metalness: 0.2
-      });
-      const groundMesh = new THREE.Mesh(groundGeo, groundMat);
-      groundMesh.rotation.x = -Math.PI / 2;
-      groundMesh.receiveShadow = true;
-      scene.add(groundMesh);
+      // Floor Shadow receiver
+      const floorGeo = new THREE.PlaneGeometry(30, 30);
+      const floorMat = new THREE.MeshStandardMaterial({ color: 0x090d14, roughness: 0.9, metalness: 0.1 });
+      const floor = new THREE.Mesh(floorGeo, floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      scene.add(floor);
 
-      // 6. Build Procedural Quadruped Mesh Structure
-      buildQuadruped();
+      // 6. Build the 3-DoF per leg Quadruped model
+      build3DoFQuadruped();
 
-      // Mouse Orbit controls (procedural drag)
-      setupOrbitInteraction(container);
+      // 7. Camera Orbit handlers
+      setupOrbitControl(container);
 
-      // Height Slider listener
-      const heightSlider = document.getElementById('stance-slider');
+      // 8. Height Slider listener
+      const heightSlider = document.getElementById('chassis-z-slider');
       if (heightSlider) {
         heightSlider.addEventListener('input', (e) => {
           baseHeight = parseFloat(e.target.value);
         });
       }
 
-      // Responsive window resize
       window.addEventListener('resize', onWindowResize);
     }
 
-    // Build Robot Geometry
-    function buildQuadruped() {
-      quadrupedGroup = new THREE.Group();
-      quadrupedGroup.position.y = baseHeight;
+    // Build Robot Geometry reflecting 3-DoF leg topology:
+    // Joint 1: Hip Roll (Abduction/Adduction bracket)
+    // Joint 2: Hip Pitch (Thigh link)
+    // Joint 3: Knee Pitch (Calf link)
+    function build3DoFQuadruped() {
+      quadrupedRoot = new THREE.Group();
+      quadrupedRoot.position.y = baseHeight;
 
-      // Default Optical Wireframe / Dark Tech Materials
-      robotMaterials.chassis = new THREE.MeshStandardMaterial({
-        color: 0x121824,
-        roughness: 0.3,
-        metalness: 0.85,
-        wireframe: false
-      });
+      // Materials
+      matChassis = new THREE.MeshStandardMaterial({ color: 0x141d2e, metalness: 0.8, roughness: 0.3 });
+      matAbAdBracket = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.85, roughness: 0.2 });
+      matThigh = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.4 });
+      matCalf = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7, roughness: 0.3 });
+      matFoot = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.8 });
+      matCameraVision = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.35 });
 
-      robotMaterials.joints = new THREE.MeshStandardMaterial({
-        color: 0x2a3852,
-        roughness: 0.4,
-        metalness: 0.9
-      });
+      // Chassis Trunk
+      const trunkGeo = new THREE.BoxGeometry(0.5, 0.18, 0.95);
+      const trunk = new THREE.Mesh(trunkGeo, matChassis);
+      trunk.castShadow = true;
+      trunk.receiveShadow = true;
+      quadrupedRoot.add(trunk);
 
-      robotMaterials.accents = new THREE.MeshBasicMaterial({
-        color: 0x00f0ff,
-        wireframe: false
-      });
+      // Top Electronics Enclosure
+      const topEnclosureGeo = new THREE.BoxGeometry(0.38, 0.08, 0.7);
+      const topEnclosure = new THREE.Mesh(topEnclosureGeo, matChassis);
+      topEnclosure.position.y = 0.12;
+      quadrupedRoot.add(topEnclosure);
 
-      // Chassis Body (Main Torso)
-      const bodyGeo = new THREE.BoxGeometry(0.7, 0.3, 1.4);
-      const bodyMesh = new THREE.Mesh(bodyGeo, robotMaterials.chassis);
-      bodyMesh.castShadow = true;
-      bodyMesh.receiveShadow = true;
-      quadrupedGroup.add(bodyMesh);
+      // Front Vision Camera Bar (Stereo baseline)
+      const camBarGeo = new THREE.BoxGeometry(0.32, 0.06, 0.08);
+      const camBar = new THREE.Mesh(camBarGeo, matAbAdBracket);
+      camBar.position.set(0, 0.08, 0.5);
+      quadrupedRoot.add(camBar);
 
-      // Dorsal Armor Spine
-      const spineGeo = new THREE.BoxGeometry(0.5, 0.1, 1.2);
-      const spineMesh = new THREE.Mesh(spineGeo, robotMaterials.joints);
-      spineMesh.position.y = 0.18;
-      quadrupedGroup.add(spineMesh);
+      // Left & Right Stereo Lenses
+      const lensGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.04, 12);
+      lensGeo.rotateX(Math.PI / 2);
+      const lensL = new THREE.Mesh(lensGeo, matChassis);
+      lensL.position.set(-0.1, 0.08, 0.54);
+      quadrupedRoot.add(lensL);
+      const lensR = new THREE.Mesh(lensGeo, matChassis);
+      lensR.position.set(0.1, 0.08, 0.54);
+      quadrupedRoot.add(lensR);
 
-      // Sensor Head Unit (LiDAR / Optics)
-      const headGeo = new THREE.BoxGeometry(0.35, 0.22, 0.35);
-      const headMesh = new THREE.Mesh(headGeo, robotMaterials.chassis);
-      headMesh.position.set(0, 0.14, 0.75);
-      quadrupedGroup.add(headMesh);
+      // Camera Vision Projected Frustum Pyramid
+      const frustumGeo = new THREE.ConeGeometry(0.65, 1.4, 4, 1, true);
+      frustumGeo.rotateX(-Math.PI / 2);
+      frustumGeo.rotateY(Math.PI / 4);
+      visionFrustumMesh = new THREE.Mesh(frustumGeo, matCameraVision);
+      visionFrustumMesh.position.set(0, 0.08, 1.25);
+      quadrupedRoot.add(visionFrustumMesh);
 
-      // Cyber Vision Visor Line
-      const visorGeo = new THREE.BoxGeometry(0.3, 0.05, 0.05);
-      const visorMesh = new THREE.Mesh(visorGeo, robotMaterials.accents);
-      visorMesh.position.set(0, 0.14, 0.93);
-      quadrupedGroup.add(visorMesh);
-
-      // LiDAR Dome
-      const lidarDome = new THREE.CylinderGeometry(0.1, 0.1, 0.08, 16);
-      const lidarMesh = new THREE.Mesh(lidarDome, robotMaterials.accents);
-      lidarMesh.position.set(0, 0.28, 0.4);
-      quadrupedGroup.add(lidarMesh);
-
-      // Legs Definition: [x, z, phaseOffset]
-      // Leg layout: Front-Left, Front-Right, Rear-Left, Rear-Right
-      const legPositions = [
-        { x: -0.42, z: 0.55, phase: 0 },             // FL
-        { x: 0.42, z: 0.55, phase: Math.PI },        // FR
-        { x: -0.42, z: -0.55, phase: Math.PI },       // RL
-        { x: 0.42, z: -0.55, phase: 0 }              // RR
+      // Leg positions: [x, z, phase]
+      const legDef = [
+        { name: 'FL', x: -0.32, z: 0.36, phase: 0 },
+        { name: 'FR', x: 0.32, z: 0.36, phase: Math.PI },
+        { name: 'RL', x: -0.32, z: -0.36, phase: Math.PI },
+        { name: 'RR', x: 0.32, z: -0.36, phase: 0 }
       ];
 
-      legs = [];
+      legAssemblies = [];
 
-      legPositions.forEach(pos => {
-        const hipJoint = new THREE.Group();
-        hipJoint.position.set(pos.x, -0.05, pos.z);
+      legDef.forEach(def => {
+        // --- Joint 1: Hip Abduction / Adduction Bracket (Roll axis) ---
+        const abAdJoint = new THREE.Group();
+        abAdJoint.position.set(def.x, 0, def.z);
 
-        // Shoulder Hub
-        const shoulderGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.14, 16);
-        shoulderGeo.rotateZ(Math.PI / 2);
-        const shoulderMesh = new THREE.Mesh(shoulderGeo, robotMaterials.joints);
-        hipJoint.add(shoulderMesh);
+        const abAdMotorGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.12, 16);
+        abAdMotorGeo.rotateX(Math.PI / 2);
+        const abAdMotor = new THREE.Mesh(abAdMotorGeo, matAbAdBracket);
+        abAdJoint.add(abAdMotor);
 
-        // Upper Leg Link (Femur)
-        const upperLegGroup = new THREE.Group();
-        upperLegGroup.position.set(pos.x > 0 ? 0.06 : -0.06, 0, 0);
+        // --- Joint 2: Hip Pitch Housing (Pitch axis) ---
+        const hipPitchJoint = new THREE.Group();
+        const sideOffset = def.x > 0 ? 0.07 : -0.07;
+        hipPitchJoint.position.set(sideOffset, 0, 0);
 
-        const upperGeo = new THREE.BoxGeometry(0.09, 0.5, 0.1);
-        const upperMesh = new THREE.Mesh(upperGeo, robotMaterials.chassis);
-        upperMesh.position.y = -0.22;
-        upperMesh.castShadow = true;
-        upperLegGroup.add(upperMesh);
+        const hipPitchMotorGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.1, 16);
+        hipPitchMotorGeo.rotateZ(Math.PI / 2);
+        const hipPitchMotor = new THREE.Mesh(hipPitchMotorGeo, matThigh);
+        hipPitchJoint.add(hipPitchMotor);
 
-        // Knee Joint
-        const kneeGroup = new THREE.Group();
-        kneeGroup.position.y = -0.44;
+        // Thigh Link (Femur)
+        const thighGeo = new THREE.BoxGeometry(0.06, 0.38, 0.08);
+        const thigh = new THREE.Mesh(thighGeo, matThigh);
+        thigh.position.y = -0.18;
+        thigh.castShadow = true;
+        hipPitchJoint.add(thigh);
 
-        const kneeJointGeo = new THREE.SphereGeometry(0.065, 12, 12);
-        const kneeMesh = new THREE.Mesh(kneeJointGeo, robotMaterials.joints);
-        kneeGroup.add(kneeMesh);
+        // --- Joint 3: Knee Pitch Hub (Knee axis) ---
+        const kneePitchJoint = new THREE.Group();
+        kneePitchJoint.position.y = -0.36;
 
-        // Lower Leg Link (Tibia)
-        const lowerGeo = new THREE.CylinderGeometry(0.04, 0.02, 0.55, 8);
-        const lowerMesh = new THREE.Mesh(lowerGeo, robotMaterials.joints);
-        lowerMesh.position.y = -0.26;
-        lowerMesh.castShadow = true;
-        kneeGroup.add(lowerMesh);
+        const kneeHubGeo = new THREE.SphereGeometry(0.05, 12, 12);
+        const kneeHub = new THREE.Mesh(kneeHubGeo, matAbAdBracket);
+        kneePitchJoint.add(kneeHub);
 
-        // Rubber Foot Pad
-        const footGeo = new THREE.SphereGeometry(0.05, 12, 12);
-        const footMesh = new THREE.Mesh(footGeo, robotMaterials.accents);
-        footMesh.position.y = -0.54;
-        kneeGroup.add(footMesh);
+        // Calf Link (Tibia)
+        const calfGeo = new THREE.CylinderGeometry(0.03, 0.018, 0.42, 12);
+        const calf = new THREE.Mesh(calfGeo, matCalf);
+        calf.position.y = -0.20;
+        calf.castShadow = true;
+        kneePitchJoint.add(calf);
 
-        upperLegGroup.add(kneeGroup);
-        hipJoint.add(upperLegGroup);
-        quadrupedGroup.add(hipJoint);
+        // Rubber Foot contact pad
+        const footGeo = new THREE.SphereGeometry(0.042, 12, 12);
+        const foot = new THREE.Mesh(footGeo, matFoot);
+        foot.position.y = -0.41;
+        kneePitchJoint.add(foot);
 
-        legs.push({
-          hip: hipJoint,
-          upper: upperLegGroup,
-          knee: kneeGroup,
-          phase: pos.phase,
-          baseX: pos.x,
-          baseZ: pos.z
+        // Assemble hierarchy
+        hipPitchJoint.add(kneePitchJoint);
+        abAdJoint.add(hipPitchJoint);
+        quadrupedRoot.add(abAdJoint);
+
+        legAssemblies.push({
+          name: def.name,
+          abAd: abAdJoint,
+          hip: hipPitchJoint,
+          knee: kneePitchJoint,
+          phase: def.phase,
+          baseX: def.x,
+          baseZ: def.z
         });
       });
 
-      scene.add(quadrupedGroup);
+      scene.add(quadrupedRoot);
     }
 
-    // Gait Calculation Loop
-    function updateLegKinematics(time) {
-      if (!quadrupedGroup) return;
+    // Kinematic Gait Solver Loop
+    function updateKinematics(time) {
+      if (!quadrupedRoot) return;
 
-      // Handle Jump/Reckon Pulse
-      if (isLeaping) {
-        leapTimer += 0.05;
-        const jumpY = Math.sin(leapTimer * Math.PI) * 0.8;
-        quadrupedGroup.position.y = baseHeight + Math.max(0, jumpY);
-        
-        // Tuck legs during jump
-        legs.forEach((leg, i) => {
-          leg.upper.rotation.x = -0.6;
-          leg.knee.rotation.x = 1.2;
+      const flLeg = legAssemblies[0];
+
+      if (currentGait === 'stance') {
+        quadrupedRoot.position.y = THREE.MathUtils.lerp(quadrupedRoot.position.y, baseHeight, 0.1);
+        quadrupedRoot.rotation.x = THREE.MathUtils.lerp(quadrupedRoot.rotation.x, 0, 0.1);
+        quadrupedRoot.rotation.z = THREE.MathUtils.lerp(quadrupedRoot.rotation.z, 0, 0.1);
+
+        legAssemblies.forEach(leg => {
+          leg.abAd.rotation.z = THREE.MathUtils.lerp(leg.abAd.rotation.z, 0, 0.1);
+          leg.hip.rotation.x = THREE.MathUtils.lerp(leg.hip.rotation.x, 0.45, 0.1);
+          leg.knee.rotation.x = THREE.MathUtils.lerp(leg.knee.rotation.x, -0.92, 0.1);
         });
 
-        if (leapTimer >= 1.0) {
-          isLeaping = false;
-          leapTimer = 0;
-          quadrupedGroup.position.y = baseHeight;
+        updateHudReadout(0.0, 0.45, -0.92);
+        return;
+      }
+
+      if (currentGait === 'wave') {
+        // Front Left paws / waves high in the air
+        quadrupedRoot.position.y = THREE.MathUtils.lerp(quadrupedRoot.position.y, baseHeight * 0.9, 0.1);
+        quadrupedRoot.rotation.x = THREE.MathUtils.lerp(quadrupedRoot.rotation.x, -0.2, 0.1);
+
+        // Legs 1,2,3 support
+        for (let i = 1; i < 4; i++) {
+          legAssemblies[i].hip.rotation.x = 0.55;
+          legAssemblies[i].knee.rotation.x = -1.1;
         }
+
+        // FL paw wave
+        const wave = Math.sin(time * 6) * 0.4;
+        flLeg.abAd.rotation.z = 0.15;
+        flLeg.hip.rotation.x = -1.1 + wave * 0.3;
+        flLeg.knee.rotation.x = -0.4 + wave * 0.5;
+
+        updateHudReadout(0.15, flLeg.hip.rotation.x, flLeg.knee.rotation.x);
         return;
       }
 
-      // Gait dynamics
-      if (currentGait === 'stand') {
-        quadrupedGroup.position.y = THREE.MathUtils.lerp(quadrupedGroup.position.y, baseHeight, 0.1);
-        quadrupedGroup.rotation.z = THREE.MathUtils.lerp(quadrupedGroup.rotation.z, 0, 0.1);
-        quadrupedGroup.rotation.x = THREE.MathUtils.lerp(quadrupedGroup.rotation.x, 0, 0.1);
+      // Trot or Walk Gait kinematics
+      const freq = currentGait === 'trot' ? 4.8 : 2.5;
+      const pitchAmp = currentGait === 'trot' ? 0.38 : 0.26;
+      const kneeAmp = currentGait === 'trot' ? 0.45 : 0.30;
 
-        legs.forEach(leg => {
-          leg.upper.rotation.x = THREE.MathUtils.lerp(leg.upper.rotation.x, 0.15, 0.1);
-          leg.knee.rotation.x = THREE.MathUtils.lerp(leg.knee.rotation.x, -0.3, 0.1);
-          leg.upper.rotation.z = THREE.MathUtils.lerp(leg.upper.rotation.z, 0, 0.1);
-        });
-        return;
-      }
+      // Chassis sway
+      const bob = Math.cos(time * freq * 2) * 0.035;
+      quadrupedRoot.position.y = baseHeight + bob;
+      quadrupedRoot.rotation.z = Math.sin(time * freq) * 0.02;
+      quadrupedRoot.rotation.x = -bob * 0.3;
 
-      // Trot or Crawl Gait Math
-      const freq = currentGait === 'trot' ? gaitSpeed : gaitSpeed * 0.45;
-      const legAmplitude = currentGait === 'trot' ? 0.35 : 0.22;
-      const kneeAmplitude = currentGait === 'trot' ? 0.45 : 0.3;
-
-      // Sway & Bob
-      const bob = Math.cos(time * freq * 2) * 0.04;
-      const rollSway = Math.sin(time * freq) * 0.02;
-      quadrupedGroup.position.y = baseHeight + bob;
-      quadrupedGroup.rotation.z = rollSway;
-      quadrupedGroup.rotation.x = -bob * 0.4;
-
-      legs.forEach((leg, idx) => {
+      legAssemblies.forEach((leg, index) => {
         let phase = leg.phase;
-        // In crawl gait, make 4 distinct phase offsets
-        if (currentGait === 'crawl') {
-          phase = idx * (Math.PI / 2);
+        if (currentGait === 'walk') {
+          // Sequential crawl phase 0, pi/2, pi, 3pi/2
+          phase = index * (Math.PI / 2);
         }
 
         const cycle = time * freq + phase;
-        const upperAngle = Math.sin(cycle) * legAmplitude;
-        const kneeAngle = Math.max(0, Math.cos(cycle) * kneeAmplitude) - 0.25;
+        const q2 = Math.sin(cycle) * pitchAmp + 0.35;
+        const q3 = Math.max(0, Math.cos(cycle) * kneeAmp) - 0.95;
+        const q1 = Math.sin(cycle * 0.5) * 0.05; // Gentle lateral abduction balancing
 
-        leg.upper.rotation.x = upperAngle;
-        leg.knee.rotation.x = -kneeAngle - 0.15;
+        leg.abAd.rotation.z = (leg.baseX > 0 ? 1 : -1) * q1;
+        leg.hip.rotation.x = q2;
+        leg.knee.rotation.x = q3;
       });
+
+      if (flLeg) {
+        updateHudReadout(flLeg.abAd.rotation.z, flLeg.hip.rotation.x, flLeg.knee.rotation.x);
+      }
     }
 
-    // Vision Mode HUD Switcher
-    function setVisionMode(mode) {
-      currentVision = mode;
-      
-      const btnOptical = document.getElementById('btn-hud-optical');
-      const btnLidar = document.getElementById('btn-hud-lidar');
-      const btnThermal = document.getElementById('btn-hud-thermal');
+    function updateHudReadout(q1, q2, q3) {
+      const elQ1 = document.getElementById('hud-q1');
+      const elQ2 = document.getElementById('hud-q2');
+      const elQ3 = document.getElementById('hud-q3');
+      if (elQ1) elQ1.innerText = `${q1 >= 0 ? '+' : ''}${q1.toFixed(2)} rad`;
+      if (elQ2) elQ2.innerText = `${q2 >= 0 ? '+' : ''}${q2.toFixed(2)} rad`;
+      if (elQ3) elQ3.innerText = `${q3 >= 0 ? '+' : ''}${q3.toFixed(2)} rad`;
+    }
 
-      [btnOptical, btnLidar, btnThermal].forEach(btn => {
-        if(btn) {
-          btn.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-border text-slate-400 transition-all hover:border-brand-cyan hover:text-white";
+    // Toggle Camera Frustum
+    function toggleVisionFrustum() {
+      showVisionFrustum = !showVisionFrustum;
+      if (visionFrustumMesh) {
+        visionFrustumMesh.visible = showVisionFrustum;
+      }
+      const label = document.getElementById('vision-cone-text');
+      if (label) label.innerText = showVisionFrustum ? 'CAMERA FOV: ON' : 'CAMERA FOV: OFF';
+    }
+
+    // Toggle Wireframe Link visualizer
+    function toggleWireframeMode() {
+      isWireframeMode = !isWireframeMode;
+      const materials = [matChassis, matAbAdBracket, matThigh, matCalf];
+      materials.forEach(m => {
+        if (m) m.wireframe = isWireframeMode;
+      });
+      const label = document.getElementById('skeleton-mode-text');
+      if (label) label.innerText = isWireframeMode ? '3-DoF LINKS: WIRE' : '3-DoF LINKS: SOLID';
+    }
+
+    // Gait Buttons
+    function setResearchGait(gait) {
+      currentGait = gait;
+      const btns = ['trot', 'walk', 'stance', 'wave'];
+      btns.forEach(b => {
+        const el = document.getElementById(`gait-${b}`);
+        if (!el) return;
+        if (b === gait) {
+          el.className = "px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-accent text-brand-black transition";
+        } else if (b === 'wave') {
+          el.className = "px-2.5 py-1 text-xs font-mono rounded bg-brand-amber/20 border border-brand-amber text-brand-amber hover:bg-brand-amber/30 transition";
+        } else {
+          el.className = "px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-accent transition";
         }
       });
-
-      if (mode === 'optical') {
-        btnOptical.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-cyan text-brand-cyan";
-        robotMaterials.chassis.wireframe = true;
-        robotMaterials.chassis.color.setHex(0x00f0ff);
-        robotMaterials.joints.color.setHex(0x1e293b);
-        robotMaterials.accents.color.setHex(0xffffff);
-        scene.background.setHex(0x07090e);
-        updateLogStatus("Vision HUD: Optical Wireframe Mesh & Kinematic Bounds active");
-      } else if (mode === 'lidar') {
-        btnLidar.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-emerald text-brand-emerald";
-        robotMaterials.chassis.wireframe = false;
-        robotMaterials.chassis.color.setHex(0x022c22);
-        robotMaterials.joints.color.setHex(0x00ff88);
-        robotMaterials.accents.color.setHex(0x00ff88);
-        scene.background.setHex(0x04130e);
-        updateLogStatus("Vision HUD: 128-Beam Solid-State LiDAR Point Cloud rendering");
-      } else if (mode === 'thermal') {
-        btnThermal.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-crimson text-brand-crimson";
-        robotMaterials.chassis.wireframe = false;
-        robotMaterials.chassis.color.setHex(0x6b001a);
-        robotMaterials.joints.color.setHex(0xffaa00);
-        robotMaterials.accents.color.setHex(0xff003c);
-        scene.background.setHex(0x180508);
-        updateLogStatus("Vision HUD: Long-Wave FLIR Thermal Spectrum calibrated");
-      }
     }
 
-    // Gait Controls
-    function setGait(gait) {
-      currentGait = gait;
-      const bTrot = document.getElementById('gait-trot');
-      const bCrawl = document.getElementById('gait-crawl');
-      const bStand = document.getElementById('gait-stand');
-
-      [bTrot, bCrawl, bStand].forEach(b => {
-        if(b) b.className = "px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-cyan transition";
-      });
-
-      if (gait === 'trot') {
-        bTrot.className = "px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition";
-        updateLogStatus("Inverse Kinematics: Fast Trot Dynamic Balance [STABLE]");
-      } else if (gait === 'crawl') {
-        bCrawl.className = "px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition";
-        updateLogStatus("Inverse Kinematics: Creep Crawl Terrain Traverse [HIGH TORQUE]");
-      } else if (gait === 'stand') {
-        bStand.className = "px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition";
-        updateLogStatus("Inverse Kinematics: Stance Hold Zero-Moment Point lock");
-      }
-    }
-
-    function triggerAgileLeap() {
-      if (isLeaping) return;
-      isLeaping = true;
-      leapTimer = 0;
-      updateLogStatus("Agile Maneuver: High Dynamic Leap / Trench Clearance initiated");
-    }
-
-    function updateLogStatus(text) {
-      const el = document.getElementById('live-sim-status');
-      if (el) el.innerHTML = `&gt; ${text}`;
-    }
-
-    // Orbit Interaction Implementation (Vanilla Three.js Mouse/Touch handler)
-    function setupOrbitInteraction(container) {
+    // Orbit Drag Navigation
+    function setupOrbitControl(container) {
       let isDragging = false;
       let prevMousePos = { x: 0, y: 0 };
-      let spherical = { radius: 5.5, theta: 0.8, phi: 1.1 };
+      let spherical = { radius: 4.8, theta: 0.7, phi: 1.1 };
 
-      function updateCameraFromSpherical() {
-        spherical.phi = Math.max(0.2, Math.min(Math.PI / 2.1, spherical.phi));
+      function updateCamera() {
+        spherical.phi = Math.max(0.15, Math.min(Math.PI / 2.05, spherical.phi));
         camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
         camera.position.y = spherical.radius * Math.cos(spherical.phi);
         camera.position.z = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
-        camera.lookAt(0, 0.5, 0);
+        camera.lookAt(0, 0.45, 0);
       }
 
       container.addEventListener('mousedown', (e) => {
         isDragging = true;
         prevMousePos = { x: e.clientX, y: e.clientY };
       });
-
       window.addEventListener('mouseup', () => { isDragging = false; });
-
       window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        const deltaX = e.clientX - prevMousePos.x;
-        const deltaY = e.clientY - prevMousePos.y;
+        const dx = e.clientX - prevMousePos.x;
+        const dy = e.clientY - prevMousePos.y;
         prevMousePos = { x: e.clientX, y: e.clientY };
-
-        spherical.theta -= deltaX * 0.008;
-        spherical.phi -= deltaY * 0.008;
-        updateCameraFromSpherical();
+        spherical.theta -= dx * 0.008;
+        spherical.phi -= dy * 0.008;
+        updateCamera();
       });
 
-      // Wheel Zoom
       container.addEventListener('wheel', (e) => {
         e.preventDefault();
         spherical.radius += e.deltaY * 0.003;
-        spherical.radius = Math.max(2.5, Math.min(10.0, spherical.radius));
-        updateCameraFromSpherical();
+        spherical.radius = Math.max(2.0, Math.min(8.5, spherical.radius));
+        updateCamera();
       }, { passive: false });
 
-      // Touch handlers for mobile
+      // Touch handlers
       container.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
           isDragging = true;
@@ -1392,16 +1045,15 @@
       window.addEventListener('touchend', () => { isDragging = false; });
       container.addEventListener('touchmove', (e) => {
         if (!isDragging || e.touches.length !== 1) return;
-        const deltaX = e.touches[0].clientX - prevMousePos.x;
-        const deltaY = e.touches[0].clientY - prevMousePos.y;
+        const dx = e.touches[0].clientX - prevMousePos.x;
+        const dy = e.touches[0].clientY - prevMousePos.y;
         prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-
-        spherical.theta -= deltaX * 0.009;
-        spherical.phi -= deltaY * 0.009;
-        updateCameraFromSpherical();
+        spherical.theta -= dx * 0.009;
+        spherical.phi -= dy * 0.009;
+        updateCamera();
       });
 
-      updateCameraFromSpherical();
+      updateCamera();
     }
 
     function onWindowResize() {
@@ -1414,336 +1066,60 @@
       renderer.setSize(w, h);
     }
 
-    // Main 3D Animation Loop
     function animate() {
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
-
-      // Kinematic update
-      updateLegKinematics(elapsedTime);
-
-      // Subtle idle yaw rotation if optical mode
-      if (quadrupedGroup && currentGait !== 'stand') {
-        quadrupedGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.05;
-      }
-
+      updateKinematics(elapsedTime);
       renderer.render(scene, camera);
     }
 
-    // Synthetic SLAM LiDAR Radar Canvas
-    let radarPoints = [];
-    function initLidarRadar() {
-      const canvas = document.getElementById('lidar-radar-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
-      const center = w / 2;
+    /* ==========================================================================
+       PLANAR INVERSE KINEMATICS (IK) TEST BENCH LOGIC
+       ========================================================================== */
+    function solveInteractiveIK() {
+      const sliderX = document.getElementById('ik-slider-x');
+      const sliderZ = document.getElementById('ik-slider-z');
+      if (!sliderX || !sliderZ) return;
 
-      // Generate synthetic room perimeter points
-      for (let i = 0; i < 48; i++) {
-        const angle = (i / 48) * Math.PI * 2;
-        const dist = 75 + Math.random() * 45;
-        radarPoints.push({ angle, dist });
-      }
+      const x = parseFloat(sliderX.value);
+      const z = parseFloat(sliderZ.value);
 
-      let scanAngle = 0;
+      document.getElementById('ik-val-x').innerText = `${x.toFixed(0)} mm`;
+      document.getElementById('ik-val-z').innerText = `${z.toFixed(0)} mm`;
 
-      function drawRadar() {
-        ctx.fillStyle = 'rgba(12, 16, 23, 0.25)';
-        ctx.fillRect(0, 0, w, h);
+      // Leg Segment constants in mm
+      const L1 = 210; // Femur
+      const L2 = 225; // Tibia
 
-        // Concentric Range Rings
-        ctx.strokeStyle = '#1f293d';
-        ctx.lineWidth = 1;
-        [30, 65, 100, 135].forEach(r => {
-          ctx.beginPath();
-          ctx.arc(center, center, r, 0, Math.PI * 2);
-          ctx.stroke();
-        });
+      // Distance from hip pitch origin to foot
+      const D = Math.sqrt(x * x + z * z);
+      const clampedD = Math.min(L1 + L2 - 1, Math.max(Math.abs(L1 - L2) + 1, D));
 
-        // Crosshairs
-        ctx.beginPath();
-        ctx.moveTo(center, 0); ctx.lineTo(center, h);
-        ctx.moveTo(0, center); ctx.lineTo(w, center);
-        ctx.strokeStyle = '#172033';
-        ctx.stroke();
+      // Law of Cosines for Knee (theta3)
+      const cosTheta3 = (clampedD * clampedD - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+      const theta3Rad = -Math.acos(Math.max(-1, Math.min(1, cosTheta3)));
 
-        // Scanline sweep
-        scanAngle += 0.04;
-        ctx.strokeStyle = '#00f0ff';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.lineTo(center + Math.cos(scanAngle) * 135, center + Math.sin(scanAngle) * 135);
-        ctx.stroke();
+      // Thigh angle theta2
+      const alpha = Math.atan2(x, -z);
+      const beta = Math.acos((L1 * L1 + clampedD * clampedD - L2 * L2) / (2 * L1 * clampedD));
+      const theta2Rad = alpha + beta;
 
-        // Points
-        radarPoints.forEach(pt => {
-          const px = center + Math.cos(pt.angle) * pt.dist;
-          const py = center + Math.sin(pt.angle) * pt.dist;
-          ctx.fillStyle = '#00ff88';
-          ctx.beginPath();
-          ctx.arc(px, py, 2, 0, Math.PI * 2);
-          ctx.fill();
-        });
+      const theta2Deg = theta2Rad * (180 / Math.PI);
+      const theta3Deg = theta3Rad * (180 / Math.PI);
 
-        requestAnimationFrame(drawRadar);
-      }
-      drawRadar();
+      document.getElementById('ik-res-q2').innerText = `${theta2Deg.toFixed(1)}°`;
+      document.getElementById('ik-res-q3').innerText = `${theta3Deg.toFixed(1)}°`;
     }
 
-    // Live Telemetry stream ticker
-    function startTelemetryTick() {
-      setInterval(() => {
-        // Jitter joint temperatures & torque
-        const fl = 38.0 + Math.random() * 2.5;
-        const fr = 38.5 + Math.random() * 2.8;
-        const rl = 43.0 + Math.random() * 3.5;
-        const rr = 37.5 + Math.random() * 2.2;
-
-        const flEl = document.getElementById('temp-fl');
-        if (flEl) flEl.innerText = `${fl.toFixed(1)}°C / ${(fl * 1.1).toFixed(0)} Nm`;
-        const frEl = document.getElementById('temp-fr');
-        if (frEl) frEl.innerText = `${fr.toFixed(1)}°C / ${(fr * 1.15).toFixed(0)} Nm`;
-        const rlEl = document.getElementById('temp-rl');
-        if (rlEl) rlEl.innerText = `${rl.toFixed(1)}°C / ${(rl * 1.3).toFixed(0)} Nm`;
-        const rrEl = document.getElementById('temp-rr');
-        if (rrEl) rrEl.innerText = `${rr.toFixed(1)}°C / ${(rr * 1.05).toFixed(0)} Nm`;
-
-        // Update progress bars
-        const bFL = document.getElementById('bar-temp-fl');
-        if (bFL) bFL.style.width = `${Math.min(100, fl * 1.1)}%`;
-        const bFR = document.getElementById('bar-temp-fr');
-        if (bFR) bFR.style.width = `${Math.min(100, fr * 1.1)}%`;
-        const bRL = document.getElementById('bar-temp-rl');
-        if (bRL) bRL.style.width = `${Math.min(100, rl * 1.2)}%`;
-        const bRR = document.getElementById('bar-temp-rr');
-        if (bRR) bRR.style.width = `${Math.min(100, rr * 1.05)}%`;
-
-        // Attitude angles
-        const pitchEl = document.getElementById('tele-pitch');
-        if (pitchEl) pitchEl.innerText = `${(Math.sin(Date.now() * 0.002) * 2.2).toFixed(1)}°`;
-        const rollEl = document.getElementById('tele-roll');
-        if (rollEl) rollEl.innerText = `${(Math.cos(Date.now() * 0.0018) * 1.8).toFixed(1)}°`;
-
-        // Ping jitter
-        const pingEl = document.getElementById('tele-ping');
-        if (pingEl) pingEl.innerText = `${Math.floor(12 + Math.random() * 6)} ms`;
-      }, 1200);
-    }
-
-    function appendTelemetryLog(msg, type = 'info') {
-      const box = document.getElementById('telemetry-log-box');
-      if (!box) return;
-      const item = document.createElement('div');
-      const timeStr = new Date().toTimeString().split(' ')[0];
-      
-      let badge = '<span class="text-brand-cyan">[CMD]</span>';
-      if (type === 'warn') badge = '<span class="text-brand-amber">[WARN]</span>';
-      if (type === 'crit') badge = '<span class="text-brand-crimson">[ALERT]</span>';
-      if (type === 'ok') badge = '<span class="text-brand-emerald">[ACK]</span>';
-
-      item.innerHTML = `${badge} <span class="text-slate-500">${timeStr}</span> ${msg}`;
-      box.prepend(item);
-    }
-
-    function simulateMissionCommand(cmd) {
-      if (cmd === 'RETURN_HOME') {
-        appendTelemetryLog("AUTONOMOUS ROUTE RE-PLAN: Heading to Alpha Dock (Lat 34.052, Lon -118.243)", "ok");
-      } else if (cmd === 'EMERGENCY_STOP') {
-        appendTelemetryLog("IMMEDIATE E-STOP TRIGGERED: Electromagnetic brakes engaged. Torque dump zero.", "crit");
-        setGait('stand');
-      }
-    }
-
-    function injectSimObstacle() {
-      appendTelemetryLog("Perception Alert: Dynamic negative obstacle (drop-off 1.2m) avoided via local costmap.", "warn");
-      // Add blip to radar points
-      radarPoints.push({
-        angle: Math.random() * Math.PI * 2,
-        dist: 40 + Math.random() * 20
-      });
-      if (radarPoints.length > 60) radarPoints.shift();
-    }
-
-    // Payload Data and Customizer
-    const payloadData = {
-      arm: {
-        code: "SYS-MOD-ARM06",
-        title: "H-ARM6 Tactile Manipulator",
-        desc: "Equipped with 6 degrees of freedom, continuous wrist rotation, and force-torque feedback sensors. Capable of door breach manipulation, valve turns in high-radiation zones, and sample gathering.",
-        stat1: "920 mm",
-        stat2: "6.5 kg (Extended)",
-        stat3: "CANopen / ROS2",
-        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
-                <circle cx="50" cy="50" r="38" stroke-dasharray="4,4" class="text-brand-border" />
-                <path d="M50 20 L50 45 L70 65" stroke-linecap="round" stroke-width="3" stroke="#00f0ff"/>
-                <circle cx="50" cy="20" r="5" fill="#00f0ff"/>
-                <circle cx="70" cy="65" r="4" fill="#ffaa00"/>
-                <path d="M68 62 L78 54" stroke="#ffaa00" stroke-linecap="round"/>
-                <path d="M72 68 L82 60" stroke="#ffaa00" stroke-linecap="round"/>
-              </svg>`
-      },
-      lidar: {
-        code: "SYS-MOD-LIDAR128",
-        title: "360° Ultra-Dense LiDAR Mast",
-        desc: "Dual-axis scanning LiDAR with 1.3 million points per second output, built-in IMU, and sunlight rejection filters for daytime open-pit mining operations and millimeter-accurate 3D as-built twin capture.",
-        stat1: "150 m Range",
-        stat2: "128 Channels",
-        stat3: "Gigabit M12 Eth",
-        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
-                <cylinder cx="50" cy="50" r="30" class="text-brand-border" />
-                <rect x="36" y="30" width="28" height="40" rx="4" stroke="#00ff88" fill="#121824"/>
-                <line x1="36" y1="45" x2="64" y2="45" stroke="#00ff88"/>
-                <circle cx="50" cy="38" r="3" fill="#00ff88"/>
-                <path d="M20 50 A30 30 0 0 1 80 50" stroke="#00ff88" stroke-dasharray="3,3"/>
-              </svg>`
-      },
-      cbrn: {
-        code: "SYS-MOD-CBRN09",
-        title: "CBRN HazMat Vapor Spectrometer",
-        desc: "Integrated electrochemical and photoionization detection array. Detects chemical warfare agents, volatile organic compounds, ammonia, chlorine, and toxic industrial gases without exposing human operators.",
-        stat1: "0.1 ppb Limit",
-        stat2: "24 Gas Library",
-        stat3: "ATEX Certified",
-        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
-                <polygon points="50,22 80,72 20,72" stroke="#ffaa00" fill="#121824" stroke-width="2"/>
-                <circle cx="50" cy="54" r="8" stroke="#ffaa00"/>
-                <line x1="50" y1="36" x2="50" y2="44" stroke="#ffaa00" stroke-width="2"/>
-                <circle cx="50" cy="64" r="1.5" fill="#ffaa00"/>
-              </svg>`
-      },
-      ptz: {
-        code: "SYS-MOD-PTZ40X",
-        title: "Long-Range EO/IR Gimbal PTZ",
-        desc: "Gyrostabilized EO/IR multi-sensor payload with 40x optical zoom, long-wave thermal imaging, and continuous laser rangefinder targeting for high-threat base border surveillance and reconnaissance.",
-        stat1: "3.2 km Target ID",
-        stat2: "40x Optical",
-        stat3: "Mil-Std-461G",
-        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
-                <circle cx="50" cy="48" r="24" stroke="#00f0ff" fill="#121824"/>
-                <circle cx="50" cy="48" r="14" stroke="#00f0ff"/>
-                <circle cx="50" cy="48" r="6" fill="#00f0ff"/>
-                <path d="M50 72 L50 84 M35 84 L65 84" stroke="#00f0ff" stroke-width="2"/>
-              </svg>`
-      }
-    };
-
-    function switchPayload(key) {
-      const data = payloadData[key];
-      if (!data) return;
-
-      // Update tabs styling
-      ['arm', 'lidar', 'cbrn', 'ptz'].forEach(k => {
-        const btn = document.getElementById(`tab-${k}`);
-        if (!btn) return;
-        if (k === key) {
-          btn.className = "payload-tab active py-3 px-4 rounded-lg bg-brand-cyan text-brand-black font-mono text-xs font-bold transition flex items-center justify-center space-x-2";
-        } else {
-          btn.className = "payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2";
-        }
-      });
-
-      // Update contents
-      document.getElementById('payload-code').innerText = data.code;
-      document.getElementById('payload-title').innerText = data.title;
-      document.getElementById('payload-desc').innerText = data.desc;
-      document.getElementById('payload-stat1').innerText = data.stat1;
-      document.getElementById('payload-stat2').innerText = data.stat2;
-      document.getElementById('payload-stat3').innerText = data.stat3;
-      document.getElementById('payload-diagram').innerHTML = data.svg;
-    }
-
-    // Fleet Quote Builder Logic
-    let selectedChassis = {
-      model: 'APEX',
-      price: 78000
-    };
-
-    function calcSelectPlatform(model, price) {
-      selectedChassis.model = model;
-      selectedChassis.price = price;
-
-      ['ALPHA', 'APEX', 'CERBERUS'].forEach(m => {
-        const b = document.getElementById(`calc-model-${m}`);
-        if (!b) return;
-        if (m === model) {
-          b.className = "calc-btn p-3 rounded bg-brand-cyan/15 border-2 border-brand-cyan text-left transition";
-          b.querySelector('div').className = "text-xs font-bold text-brand-cyan font-mono";
-        } else {
-          b.className = "calc-btn p-3 rounded bg-brand-dark border border-brand-border text-left hover:border-brand-cyan transition";
-          b.querySelector('div').className = "text-xs font-bold text-white font-mono";
-        }
-      });
-
-      updateCalculation();
-    }
-
-    function quickSelectFleet(model) {
-      const price = model === 'ALPHA' ? 42000 : (model === 'APEX' ? 78000 : 115000);
-      calcSelectPlatform(model, price);
-      const calcEl = document.getElementById('calculator');
-      if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function updateCalculation() {
-      const qtySlider = document.getElementById('calc-quantity');
-      const qty = parseInt(qtySlider.value, 10);
-      document.getElementById('calc-qty-label').innerText = `${qty} ${qty === 1 ? 'Unit' : 'Units'}`;
-      document.getElementById('summary-qty').innerText = `${qty} Units`;
-
-      // Hardware calculation
-      let unitHardwarePrice = selectedChassis.price;
-
-      if (document.getElementById('addon-arm')?.checked) unitHardwarePrice += 18500;
-      if (document.getElementById('addon-dock')?.checked) unitHardwarePrice += 12000;
-      if (document.getElementById('addon-lidar')?.checked) unitHardwarePrice += 14200;
-      if (document.getElementById('addon-cbrn')?.checked) unitHardwarePrice += 9500;
-
-      const totalHardware = unitHardwarePrice * qty;
-      const softwareCost = parseInt(document.getElementById('calc-software').value, 10);
-      const grandTotal = totalHardware + softwareCost;
-
-      // Update DOM
-      document.getElementById('summary-model').innerText = `HUND ${selectedChassis.model} ($${selectedChassis.price.toLocaleString()})`;
-      document.getElementById('summary-hw-total').innerText = `$${totalHardware.toLocaleString()}`;
-      document.getElementById('summary-sw-total').innerText = `$${softwareCost.toLocaleString()} / yr`;
-      document.getElementById('summary-grand-total').innerText = `$${grandTotal.toLocaleString()}`;
-    }
-
-    function handleQuoteSubmit() {
-      const email = document.getElementById('rfq-email').value;
-      const notif = document.getElementById('rfq-notification');
-      if (!email || !email.includes('@')) {
-        notif.innerText = "! Please enter a valid organization or defense email address.";
-        notif.className = "mt-3 p-2 bg-brand-crimson/20 border border-brand-crimson rounded text-center text-xs font-mono text-brand-crimson block";
-        return;
-      }
-
-      notif.innerHTML = `&check; RFQ Encrypted & Dispatched. Engineering spec sent to <b>${email}</b>.`;
-      notif.className = "mt-3 p-2 bg-brand-emerald/15 border border-brand-emerald rounded text-center text-xs font-mono text-brand-emerald block";
-    }
-
-    // Master Window Load Init
+    // Init on window load
     window.onload = function() {
-      // 1. Initialize 3D WebGL Quadruped Simulator
       init3DSimulator();
       animate();
+      solveInteractiveIK();
 
-      // 2. Initialize SLAM Radar Canvas
-      initLidarRadar();
-
-      // 3. Start Telemetry stream
-      startTelemetryTick();
-
-      // 4. Initialize Lucide Icons
       if (window.lucide) {
         lucide.createIcons();
       }
-
-      // 5. Initial Quote calculation
-      updateCalculation();
     };
   </script>
 </body>
