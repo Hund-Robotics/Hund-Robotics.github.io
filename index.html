@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HUND Robotics | Autonomous Quadruped Systems & Defense</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              black: '#07090e',
+              dark: '#0c1017',
+              panel: '#121824',
+              border: '#1f293d',
+              cyan: '#00f0ff',
+              cyanGlow: 'rgba(0, 240, 255, 0.25)',
+              amber: '#ffaa00',
+              crimson: '#ff003c',
+              emerald: '#00ff88'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'scanline': 'scan 8s linear infinite',
+            'spin-slow': 'spin 12s linear infinite'
+          },
+          keyframes: {
+            scan: {
+              '0%': { transform: 'translateY(-100%)' },
+              '100%': { transform: 'translateY(1000%)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+    
+    body {
+      background-color: #07090e;
+      color: #e2e8f0;
+      overflow-x: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Custom Tech Grid & Scanline FX */
+    .bg-grid-tech {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    .glow-cyan {
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
+    }
+    
+    .glow-cyan-sm {
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #07090e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+    
+    /* HUD Corner Cutouts */
+    .clip-tech {
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    }
+    .clip-tag {
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    }
+  </style>
+</head>
+<body class="bg-brand-black text-slate-200 antialiased selection:bg-brand-cyan selection:text-black">
+
+  <!-- Top Global Tech Status Bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-brand-black/85 border-b border-brand-border/70 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center space-x-3 group">
+        <div class="w-9 h-9 bg-brand-panel border border-brand-cyan/40 rounded flex items-center justify-center relative overflow-hidden group-hover:border-brand-cyan transition-colors">
+          <div class="absolute inset-0 bg-brand-cyan/10 scale-0 group-hover:scale-100 transition-transform"></div>
+          <span class="font-mono font-black text-lg text-brand-cyan tracking-wider">H</span>
+          <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-cyan"></div>
+        </div>
+        <div>
+          <span class="font-extrabold tracking-widest text-lg text-white">HUND<span class="text-brand-cyan font-mono text-sm ml-1">//ROBOTICS</span></span>
+          <p class="text-[9px] font-mono text-slate-500 uppercase tracking-widest hidden sm:block">Tactical Quadruped Systems</p>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center space-x-8 text-xs font-mono tracking-wider">
+        <a href="#simulator" class="text-slate-400 hover:text-brand-cyan transition-colors flex items-center space-x-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-cyan/50"></span>
+          <span>SIMULATOR</span>
+        </a>
+        <a href="#fleet" class="text-slate-400 hover:text-brand-cyan transition-colors">FLEET UNITS</a>
+        <a href="#telemetry" class="text-slate-400 hover:text-brand-cyan transition-colors">TELEMETRY</a>
+        <a href="#payloads" class="text-slate-400 hover:text-brand-cyan transition-colors">PAYLOADS</a>
+        <a href="#solutions" class="text-slate-400 hover:text-brand-cyan transition-colors">INDUSTRIES</a>
+        <a href="#calculator" class="text-slate-400 hover:text-brand-cyan transition-colors">DEPLOY</a>
+      </nav>
+
+      <!-- System status indicator & Contact button -->
+      <div class="flex items-center space-x-4">
+        <div class="hidden lg:flex items-center space-x-2 text-[10px] font-mono px-2.5 py-1 bg-brand-panel border border-brand-border rounded">
+          <span class="w-2 h-2 rounded-full bg-brand-emerald animate-pulse"></span>
+          <span class="text-slate-400">CORE ARCH v4.19</span>
+          <span class="text-brand-cyan">ONLINE</span>
+        </div>
+        <a href="#calculator" class="clip-tech px-4 py-2 bg-brand-cyan text-brand-black text-xs font-bold font-mono tracking-wider hover:bg-white transition-all shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+          DEPLOY FLEET &rarr;
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO & INTERACTIVE QUADRUPED 3D LAB -->
+  <section id="simulator" class="relative pt-24 pb-16 min-h-screen bg-grid-tech flex flex-col justify-center border-b border-brand-border">
+    <!-- Background Ambient Lighting -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-brand-cyan/10 blur-[130px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col lg:flex-row gap-8 items-stretch pt-4">
+      
+      <!-- Left Column: Vision & Pitch -->
+      <div class="lg:w-5/12 flex flex-col justify-between py-4">
+        <div>
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded bg-brand-panel border border-brand-border text-brand-cyan text-xs font-mono mb-6">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-brand-cyan"></i>
+            <span>ENTERPRISE MIL-SPEC AUTONOMY</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight uppercase">
+            Bred for the <br/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-teal-300 to-emerald-400">
+              Unforgiving.
+            </span>
+          </h1>
+
+          <p class="mt-5 text-slate-400 text-sm sm:text-base leading-relaxed font-light">
+            Engineered for hostile perimeter defense, subterranean mining surveys, hazardous CBRN reconnaissance, and disaster response. The HUND Autonomous Quadruped platform combines high-torque harmonic drives with neural edge perception.
+          </p>
+
+          <!-- Quick Metrics Bar -->
+          <div class="grid grid-cols-3 gap-3 my-8 pt-4 border-t border-brand-border">
+            <div class="p-3 bg-brand-panel/60 border border-brand-border rounded">
+              <span class="text-xs font-mono text-slate-500 block">MAX SPEED</span>
+              <span class="text-xl font-bold font-mono text-white">4.8 <span class="text-xs text-brand-cyan">m/s</span></span>
+            </div>
+            <div class="p-3 bg-brand-panel/60 border border-brand-border rounded">
+              <span class="text-xs font-mono text-slate-500 block">PAYLOAD</span>
+              <span class="text-xl font-bold font-mono text-white">45 <span class="text-xs text-brand-cyan">kg</span></span>
+            </div>
+            <div class="p-3 bg-brand-panel/60 border border-brand-border rounded">
+              <span class="text-xs font-mono text-slate-500 block">INGRESS</span>
+              <span class="text-xl font-bold font-mono text-white">IP67 <span class="text-xs text-brand-emerald">&check;</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Terminal Log Stream -->
+        <div class="p-3.5 bg-brand-panel border border-brand-border rounded text-xs font-mono">
+          <div class="flex items-center justify-between text-slate-400 border-b border-brand-border pb-2 mb-2">
+            <span class="flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+              <span class="text-[11px] text-slate-300 font-semibold">NEURAL GAIT ENGINE</span>
+            </span>
+            <span id="hz-indicator" class="text-[10px] text-brand-cyan">1000 Hz RTOS</span>
+          </div>
+          <p id="live-sim-status" class="text-slate-400 text-[11px] truncate">
+            &gt; Quadruped inverse kinematics solver: STABLE (Trot Mode)
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive 3D Quadruped Canvas & HUD Overlay -->
+      <div class="lg:w-7/12 flex flex-col">
+        <div class="relative w-full h-[460px] sm:h-[520px] bg-brand-dark border border-brand-border rounded-xl overflow-hidden shadow-2xl group">
+          
+          <!-- WebGL Canvas Container -->
+          <div id="three-quadruped-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+          <!-- Interactive HUD Overlay: Sensor Vision Mode -->
+          <div class="absolute top-4 left-4 flex flex-wrap gap-2 z-20">
+            <button id="btn-hud-optical" onclick="setVisionMode('optical')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-cyan text-brand-cyan transition-all hover:bg-brand-cyan/20">
+              [OPTICAL WIRE]
+            </button>
+            <button id="btn-hud-lidar" onclick="setVisionMode('lidar')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-border text-slate-400 transition-all hover:border-brand-cyan hover:text-white">
+              [LiDAR CLOUD]
+            </button>
+            <button id="btn-hud-thermal" onclick="setVisionMode('thermal')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-border text-slate-400 transition-all hover:border-brand-crimson hover:text-brand-crimson">
+              [THERMAL IR]
+            </button>
+          </div>
+
+          <!-- Camera & Orbit Helper Tag -->
+          <div class="absolute top-4 right-4 z-20 text-[10px] font-mono text-slate-400 bg-brand-panel/80 px-2.5 py-1 rounded border border-brand-border backdrop-blur">
+            <span class="text-brand-cyan">&bull; 3D INTERACTIVE:</span> Drag to Orbit | Scroll to Zoom
+          </div>
+
+          <!-- Bottom HUD Gait Controls -->
+          <div class="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 bg-brand-panel/85 border border-brand-border p-3 rounded-lg backdrop-blur">
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] font-mono text-slate-400">GAIT CTRL:</span>
+              <button id="gait-trot" onclick="setGait('trot')" class="px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition">TROT</button>
+              <button id="gait-crawl" onclick="setGait('crawl')" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-cyan transition">CRAWL</button>
+              <button id="gait-stand" onclick="setGait('stand')" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-cyan transition">STANCE</button>
+              <button id="gait-jump" onclick="triggerAgileLeap()" class="px-2.5 py-1 text-xs font-mono rounded bg-brand-amber/20 border border-brand-amber text-brand-amber hover:bg-brand-amber/30 transition">RECKON</button>
+            </div>
+
+            <!-- Joint Pitch / Stance Slider -->
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] font-mono text-slate-400">CHASSIS HEIGHT:</span>
+              <input id="stance-slider" type="range" min="0.8" max="1.5" step="0.05" value="1.15" class="w-24 accent-brand-cyan bg-brand-dark cursor-pointer">
+            </div>
+          </div>
+
+          <!-- Scanline effect overlay -->
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-brand-cyan/5 to-transparent h-20 w-full animate-scanline opacity-40"></div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs font-mono text-slate-500 mt-2 px-1">
+          <span>COORDINATES: LAT 34.0522° N, LON 118.2437° W</span>
+          <span class="text-brand-cyan">TERRAIN ADAPTATION: ACTIVE (CLAY / CRUSHED GRAVEL)</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FLEET PRODUCT LINEUP -->
+  <section id="fleet" class="py-24 bg-brand-dark border-b border-brand-border relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+        <div>
+          <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// DEPLOYMENT-READY ASSETS</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase tracking-tight">The HUND Tactical Lineup</h2>
+        </div>
+        <p class="mt-4 md:mt-0 text-slate-400 text-sm max-w-md">
+          Modular chassis architecture engineered for distinct endurance, payload capacity, and aggressive off-road traversability.
+        </p>
+      </div>
+
+      <!-- Fleet Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- CARD 1: HUND ALPHA -->
+        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative flex flex-col justify-between hover:border-brand-cyan/60 transition-all duration-300 group">
+          <div class="absolute top-4 right-4">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-dark border border-brand-border text-slate-400">PATROL &amp; LIGHT RECON</span>
+          </div>
+          <div>
+            <div class="h-44 w-full bg-brand-dark/80 rounded-lg flex items-center justify-center relative overflow-hidden border border-brand-border mb-6">
+              <!-- SVG Visual Representation -->
+              <svg class="w-32 h-32 text-brand-cyan group-hover:scale-105 transition-transform duration-500" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
+                <!-- Body -->
+                <rect x="25" y="38" width="50" height="22" rx="4" stroke="currentColor" fill="#121824"/>
+                <circle cx="70" cy="48" r="4" fill="#00f0ff" stroke="none" />
+                <path d="M72 44 L80 44" stroke="#00f0ff" />
+                <!-- Legs front -->
+                <path d="M32 60 L24 75 L18 90" stroke-linecap="round"/>
+                <path d="M38 60 L44 75 L38 90" stroke-linecap="round"/>
+                <!-- Legs rear -->
+                <path d="M62 60 L58 75 L62 90" stroke-linecap="round"/>
+                <path d="M68 60 L76 75 L82 90" stroke-linecap="round"/>
+              </svg>
+              <div class="absolute bottom-2 left-3 font-mono text-[10px] text-slate-500">SPEC: HUND-A1</div>
+            </div>
+
+            <h3 class="text-2xl font-bold text-white group-hover:text-brand-cyan transition-colors">HUND ALPHA</h3>
+            <p class="text-xs text-slate-400 mt-2 font-mono">Agile Perimeter &amp; Facility Scout</p>
+            <p class="text-sm text-slate-300 mt-4 leading-relaxed font-light">
+              Lightweight carbon-titanium frame designed for rapid indoor/outdoor autonomous patrolling, thermal inspection, and high stair climbing.
+            </p>
+
+            <ul class="mt-6 space-y-2.5 text-xs font-mono border-t border-brand-border pt-5">
+              <li class="flex justify-between text-slate-400">
+                <span>RATING:</span>
+                <span class="text-white font-semibold">IP67 Waterproof</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>ENDURANCE:</span>
+                <span class="text-white font-semibold">3.5 hrs (Hot-swap)</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>PAYLOAD:</span>
+                <span class="text-white font-semibold">14 kg</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>MAX SPEED:</span>
+                <span class="text-white font-semibold">4.8 m/s (17.2 km/h)</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-4">
+            <button onclick="quickSelectFleet('ALPHA')" class="w-full py-2.5 px-4 bg-brand-dark hover:bg-brand-cyan hover:text-black border border-brand-border hover:border-brand-cyan rounded text-xs font-mono font-bold tracking-wider transition-all">
+              CONFIGURE ALPHA &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 2: HUND APEX (Featured) -->
+        <div class="bg-brand-panel border-2 border-brand-cyan rounded-xl p-6 relative flex flex-col justify-between shadow-[0_0_30px_rgba(0,240,255,0.15)] group">
+          <div class="absolute -top-3.5 right-6 bg-brand-cyan text-brand-black px-3 py-0.5 rounded text-[10px] font-mono font-black tracking-widest">
+            MOST POPULAR
+          </div>
+          <div>
+            <div class="h-44 w-full bg-brand-dark rounded-lg flex items-center justify-center relative overflow-hidden border border-brand-cyan/40 mb-6">
+              <!-- SVG Visual Representation -->
+              <svg class="w-32 h-32 text-white group-hover:scale-105 transition-transform duration-500" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                <!-- Reinforced body -->
+                <rect x="22" y="34" width="56" height="26" rx="5" stroke="#00f0ff" fill="#121824"/>
+                <path d="M30 34 L30 26 L50 26 L50 34" stroke="#ffaa00" />
+                <circle cx="74" cy="46" r="5" fill="#00f0ff" />
+                <line x1="28" y1="46" x2="48" y2="46" stroke="#00f0ff" stroke-dasharray="2,2"/>
+                <!-- Heavy Duty Legs -->
+                <path d="M30 60 L20 76 L14 90" stroke-linecap="round" stroke="#00f0ff"/>
+                <path d="M36 60 L44 76 L36 90" stroke-linecap="round" stroke="#00f0ff"/>
+                <path d="M64 60 L58 76 L62 90" stroke-linecap="round" stroke="#00f0ff"/>
+                <path d="M70 60 L80 76 L88 90" stroke-linecap="round" stroke="#00f0ff"/>
+              </svg>
+              <div class="absolute bottom-2 left-3 font-mono text-[10px] text-brand-cyan">SPEC: HUND-X9 APEX</div>
+            </div>
+
+            <h3 class="text-2xl font-bold text-white group-hover:text-brand-cyan transition-colors">HUND APEX</h3>
+            <p class="text-xs text-brand-cyan mt-2 font-mono">Heavy Tactical &amp; CBRN Response</p>
+            <p class="text-sm text-slate-300 mt-4 leading-relaxed font-light">
+              Enterprise workhorse equipped with dual RTK GNSS, 360° LiDAR, and modular high-voltage power bus for tactical arm manipulators and gas analysis.
+            </p>
+
+            <ul class="mt-6 space-y-2.5 text-xs font-mono border-t border-brand-border pt-5">
+              <li class="flex justify-between text-slate-400">
+                <span>RATING:</span>
+                <span class="text-white font-semibold">IP67 + Submersible</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>ENDURANCE:</span>
+                <span class="text-white font-semibold">5.0 hrs Operational</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>PAYLOAD:</span>
+                <span class="text-brand-cyan font-bold">35 kg</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>COMPUTE:</span>
+                <span class="text-white font-semibold">275 TOPS Neural Box</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-4">
+            <button onclick="quickSelectFleet('APEX')" class="w-full py-2.5 px-4 bg-brand-cyan text-brand-black hover:bg-white rounded text-xs font-mono font-bold tracking-wider transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+              CONFIGURE APEX &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 3: HUND CERBERUS -->
+        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative flex flex-col justify-between hover:border-brand-crimson/70 transition-all duration-300 group">
+          <div class="absolute top-4 right-4">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-dark border border-brand-crimson/40 text-brand-crimson">MIL / HEAVY LOGISTICS</span>
+          </div>
+          <div>
+            <div class="h-44 w-full bg-brand-dark/80 rounded-lg flex items-center justify-center relative overflow-hidden border border-brand-border mb-6">
+              <!-- SVG Visual Representation -->
+              <svg class="w-32 h-32 text-slate-400 group-hover:text-brand-crimson group-hover:scale-105 transition-transform duration-500" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.2">
+                <!-- Armored body -->
+                <polygon points="18,36 82,36 76,64 24,64" stroke="currentColor" fill="#121824"/>
+                <line x1="20" y1="44" x2="80" y2="44" stroke="currentColor"/>
+                <circle cx="75" cy="50" r="4" fill="#ff003c" stroke="none" />
+                <!-- Heavy Plated Limbs -->
+                <path d="M26 64 L16 80 L12 92" stroke-linecap="round"/>
+                <path d="M34 64 L42 80 L36 92" stroke-linecap="round"/>
+                <path d="M66 64 L60 80 L64 92" stroke-linecap="round"/>
+                <path d="M74 64 L84 80 L90 92" stroke-linecap="round"/>
+              </svg>
+              <div class="absolute bottom-2 left-3 font-mono text-[10px] text-slate-500">SPEC: HUND-C9 CERBERUS</div>
+            </div>
+
+            <h3 class="text-2xl font-bold text-white group-hover:text-brand-crimson transition-colors">HUND CERBERUS</h3>
+            <p class="text-xs text-brand-crimson mt-2 font-mono">Ultra-Heavy Industrial Carrier</p>
+            <p class="text-sm text-slate-300 mt-4 leading-relaxed font-light">
+              Maximum torque multi-stage harmonic actuators designed for munitions logistics, underground subterranean tunnel exploration, and extreme cold (-40°C).
+            </p>
+
+            <ul class="mt-6 space-y-2.5 text-xs font-mono border-t border-brand-border pt-5">
+              <li class="flex justify-between text-slate-400">
+                <span>ARMOR:</span>
+                <span class="text-white font-semibold">Ballistic Kevlar Core</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>PAYLOAD:</span>
+                <span class="text-brand-crimson font-bold">60 kg Max</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>TEMP RANGE:</span>
+                <span class="text-white font-semibold">-40°C to +65°C</span>
+              </li>
+              <li class="flex justify-between text-slate-400">
+                <span>COMMS:</span>
+                <span class="text-white font-semibold">COFDM MESH + Satcom</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-4">
+            <button onclick="quickSelectFleet('CERBERUS')" class="w-full py-2.5 px-4 bg-brand-dark hover:bg-brand-crimson hover:text-white border border-brand-border hover:border-brand-crimson rounded text-xs font-mono font-bold tracking-wider transition-all">
+              CONFIGURE CERBERUS &rarr;
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION CONTROL TELEMETRY SANDBOX -->
+  <section id="telemetry" class="py-24 bg-brand-black border-b border-brand-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="mb-12">
+        <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// TACTICAL FLIGHT DECK</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Live Autonomous Mission Sandbox</h2>
+        <p class="text-slate-400 text-sm mt-2">
+          Monitor synthetic unit #H-804 streaming over high-bandwidth encrypted mesh telemetry. Test remote commands in real-time.
+        </p>
+      </div>
+
+      <!-- Telemetry Dashboard Container -->
+      <div class="bg-brand-panel border border-brand-border rounded-xl overflow-hidden shadow-2xl">
+        
+        <!-- Top Status Bar -->
+        <div class="bg-brand-dark px-6 py-3 border-b border-brand-border flex flex-wrap items-center justify-between text-xs font-mono gap-4">
+          <div class="flex items-center space-x-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-emerald animate-pulse"></span>
+            <span class="font-bold text-white">UNIT: APEX-DELTA-04</span>
+            <span class="text-slate-500">|</span>
+            <span class="text-slate-400">FIRMWARE: v6.4.12-PROD</span>
+          </div>
+
+          <div class="flex items-center space-x-6 text-slate-400">
+            <div>SIGNAL: <span class="text-brand-cyan font-bold">-62 dBm (MESH)</span></div>
+            <div>LATENCY: <span id="tele-ping" class="text-brand-emerald font-bold">14 ms</span></div>
+            <div>BATTERY: <span id="tele-battery" class="text-brand-emerald font-bold">88%</span></div>
+          </div>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Column 1: Joint Torque & Thermal Radar (5 Cols) -->
+          <div class="lg:col-span-4 space-y-4">
+            <h4 class="text-xs font-mono text-slate-400 tracking-wider">JOINT THERMAL DISPERSION</h4>
+            
+            <div class="space-y-3 font-mono text-xs">
+              <div>
+                <div class="flex justify-between text-slate-400 mb-1">
+                  <span>FRONT LEFT ACTUATOR (FL-1)</span>
+                  <span id="temp-fl" class="text-brand-cyan">38.4°C / 42 Nm</span>
+                </div>
+                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
+                  <div id="bar-temp-fl" class="bg-brand-cyan h-full rounded-full transition-all duration-300" style="width: 42%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-400 mb-1">
+                  <span>FRONT RIGHT ACTUATOR (FR-1)</span>
+                  <span id="temp-fr" class="text-brand-cyan">39.1°C / 45 Nm</span>
+                </div>
+                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
+                  <div id="bar-temp-fr" class="bg-brand-cyan h-full rounded-full transition-all duration-300" style="width: 45%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-400 mb-1">
+                  <span>REAR LEFT ACTUATOR (RL-2)</span>
+                  <span id="temp-rl" class="text-brand-amber">44.8°C / 58 Nm</span>
+                </div>
+                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
+                  <div id="bar-temp-rl" class="bg-brand-amber h-full rounded-full transition-all duration-300" style="width: 58%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-400 mb-1">
+                  <span>REAR RIGHT ACTUATOR (RR-2)</span>
+                  <span id="temp-rr" class="text-brand-cyan">37.9°C / 40 Nm</span>
+                </div>
+                <div class="w-full bg-brand-dark rounded-full h-1.5 overflow-hidden">
+                  <div id="bar-temp-rr" class="bg-brand-cyan h-full rounded-full transition-all duration-300" style="width: 40%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pitch / Roll Attitude indicator -->
+            <div class="p-3 bg-brand-dark border border-brand-border rounded font-mono text-xs mt-4">
+              <div class="text-slate-400 mb-2 flex items-center justify-between">
+                <span>IMU ATTITUDE ANGLES</span>
+                <span class="text-brand-cyan">6-AXIS GYRO</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-2 bg-brand-panel rounded">
+                  <div class="text-[10px] text-slate-500">PITCH</div>
+                  <div id="tele-pitch" class="text-sm font-bold text-white">+1.4°</div>
+                </div>
+                <div class="p-2 bg-brand-panel rounded">
+                  <div class="text-[10px] text-slate-500">ROLL</div>
+                  <div id="tele-roll" class="text-sm font-bold text-white">-0.8°</div>
+                </div>
+                <div class="p-2 bg-brand-panel rounded">
+                  <div class="text-[10px] text-slate-500">YAW</div>
+                  <div id="tele-yaw" class="text-sm font-bold text-brand-cyan">184.2°</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: 2D Tactical LiDAR Map Simulation (5 Cols) -->
+          <div class="lg:col-span-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2 font-mono text-xs text-slate-400">
+                <span>SLAM POINT CLOUD RADAR</span>
+                <span class="text-brand-emerald">360° RANGE: 30m</span>
+              </div>
+              <div class="relative w-full aspect-square max-h-[260px] bg-brand-dark border border-brand-border rounded-lg overflow-hidden flex items-center justify-center">
+                <canvas id="lidar-radar-canvas" width="300" height="300" class="w-full h-full"></canvas>
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div class="w-2 h-2 rounded-full bg-brand-cyan glow-cyan-sm"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Waypoint Mission Actions -->
+            <div class="mt-4 flex items-center gap-2">
+              <button onclick="simulateMissionCommand('RETURN_HOME')" class="flex-1 py-2 text-xs font-mono bg-brand-dark hover:border-brand-cyan border border-brand-border text-slate-300 rounded transition">
+                RTL (RETURN TO BASE)
+              </button>
+              <button onclick="simulateMissionCommand('EMERGENCY_STOP')" class="px-4 py-2 text-xs font-mono bg-brand-crimson/20 border border-brand-crimson text-brand-crimson hover:bg-brand-crimson/30 rounded font-bold transition">
+                E-STOP
+              </button>
+            </div>
+          </div>
+
+          <!-- Column 3: Live Event Console Log (3 Cols) -->
+          <div class="lg:col-span-3 flex flex-col">
+            <h4 class="text-xs font-mono text-slate-400 tracking-wider mb-2">EVENT LOG BUS</h4>
+            <div id="telemetry-log-box" class="h-[260px] bg-brand-dark border border-brand-border rounded p-2.5 font-mono text-[11px] overflow-y-auto space-y-1.5 text-slate-400 flex flex-col-reverse">
+              <!-- Dynamically populated -->
+              <div><span class="text-brand-emerald">[OK]</span> Unit heartbeat acknowledged</div>
+              <div><span class="text-brand-cyan">[IMU]</span> Zero drift calibrated</div>
+              <div><span class="text-slate-500">[SYS]</span> Mesh route optimized via node #03</div>
+            </div>
+            
+            <div class="mt-3">
+              <button onclick="injectSimObstacle()" class="w-full py-1.5 text-[11px] font-mono bg-brand-panel hover:bg-brand-border border border-brand-border text-brand-cyan rounded transition">
+                + INJECT SYNTHETIC HAZARD
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MODULAR PAYLOAD INTEGRATION SYSTEM -->
+  <section id="payloads" class="py-24 bg-brand-dark border-b border-brand-border relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// PLUG &amp; PLAY AVIONICS</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Modular Mission Payloads</h2>
+        <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+          The HUND Universal Rail provides NATO-spec picatinny locks, waterproof Gigabit Ethernet, CAN-bus, and 48V/20A continuous regulated power.
+        </p>
+      </div>
+
+      <!-- Payload Selector Tabs & Interactive Display -->
+      <div class="bg-brand-panel border border-brand-border rounded-xl p-6 lg:p-8">
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          <button onclick="switchPayload('arm')" id="tab-arm" class="payload-tab active py-3 px-4 rounded-lg bg-brand-cyan text-brand-black font-mono text-xs font-bold transition flex items-center justify-center space-x-2">
+            <i data-lucide="crosshair" class="w-4 h-4"></i>
+            <span>6-DOF ROBOTIC ARM</span>
+          </button>
+          
+          <button onclick="switchPayload('lidar')" id="tab-lidar" class="payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2">
+            <i data-lucide="scan" class="w-4 h-4"></i>
+            <span>360° LIDAR TOWER</span>
+          </button>
+
+          <button onclick="switchPayload('cbrn')" id="tab-cbrn" class="payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2">
+            <i data-lucide="biohazard" class="w-4 h-4"></i>
+            <span>CBRN GAS SENSOR</span>
+          </button>
+
+          <button onclick="switchPayload('ptz')" id="tab-ptz" class="payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2">
+            <i data-lucide="camera" class="w-4 h-4"></i>
+            <span>LONG-RANGE PTZ CAM</span>
+          </button>
+        </div>
+
+        <!-- Payload Detailed View -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <div class="lg:col-span-5 bg-brand-dark rounded-xl p-6 border border-brand-border relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
+            <div id="payload-diagram" class="w-full flex items-center justify-center text-brand-cyan">
+              <!-- Visualized via Dynamic SVG/Text in JS -->
+              <svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="50" cy="50" r="38" stroke-dasharray="4,4" class="text-brand-border" />
+                <path d="M50 20 L50 45 L70 65" stroke-linecap="round" stroke-width="3" stroke="#00f0ff"/>
+                <circle cx="50" cy="20" r="5" fill="#00f0ff"/>
+                <circle cx="70" cy="65" r="4" fill="#ffaa00"/>
+                <path d="M68 62 L78 54" stroke="#ffaa00" stroke-linecap="round"/>
+                <path d="M72 68 L82 60" stroke="#ffaa00" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="absolute bottom-3 left-4 font-mono text-[11px] text-slate-500">
+              MOUNT: TOP UNIVERSAL RAIL [ISO 9409-1]
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 space-y-4">
+            <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded bg-brand-dark border border-brand-border text-[11px] font-mono text-brand-cyan">
+              <span id="payload-code">SYS-MOD-ARM06</span>
+            </div>
+
+            <h3 id="payload-title" class="text-2xl sm:text-3xl font-bold text-white uppercase">
+              H-ARM6 Tactile Manipulator
+            </h3>
+
+            <p id="payload-desc" class="text-slate-300 text-sm leading-relaxed font-light">
+              Equipped with 6 degrees of freedom, continuous wrist rotation, and force-torque feedback sensors. Capable of door breach manipulation, valve turns in high-radiation zones, and sample gathering.
+            </p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-brand-border font-mono">
+              <div>
+                <span class="text-[10px] text-slate-500 block">REACH</span>
+                <span id="payload-stat1" class="text-base font-bold text-white">920 mm</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block">LIFT CAPACITY</span>
+                <span id="payload-stat2" class="text-base font-bold text-brand-cyan">6.5 kg (Extended)</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block">INTERFACE</span>
+                <span id="payload-stat3" class="text-base font-bold text-white">CANopen / ROS2</span>
+              </div>
+            </div>
+
+            <div class="pt-4 flex items-center space-x-4">
+              <a href="#calculator" class="px-5 py-2.5 bg-brand-cyan text-brand-black text-xs font-mono font-bold rounded hover:bg-white transition-all">
+                ADD TO FLEET SPEC
+              </a>
+              <span class="text-xs font-mono text-slate-500">Tool-less installation (&lt; 90 seconds)</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INDUSTRY SOLUTIONS -->
+  <section id="solutions" class="py-24 bg-brand-black border-b border-brand-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+        <div>
+          <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// HIGH CONCAVITY ENVIRONMENTS</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Engineered for the Extremes</h2>
+        </div>
+        <p class="mt-4 md:mt-0 text-slate-400 text-sm max-w-md">
+          Where wheels get trapped and tracks snap, quadruped bio-mimetic kinetics step seamlessly across the terrain.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Defense & Perimeter Security -->
+        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative overflow-hidden group hover:border-brand-cyan transition-colors">
+          <div class="w-12 h-12 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-cyan mb-6 group-hover:border-brand-cyan transition-colors">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-brand-cyan transition-colors">Defense &amp; Base Security</h3>
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            Persistent autonomous perimeter watch, hostile intruder tracking, acoustic gunshot triangulation, and silent reconnaissance in dark terrain.
+          </p>
+          <ul class="mt-6 space-y-2 text-xs font-mono text-slate-400">
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-cyan">&rsaquo;</span>
+              <span>Encrypted AES-256 Mesh Comms</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-cyan">&rsaquo;</span>
+              <span>Autonomous Docking &amp; Inductive Charging</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-cyan">&rsaquo;</span>
+              <span>FLIR Long-Wave IR Detection</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Oil, Gas & Hazardous Utilities -->
+        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative overflow-hidden group hover:border-brand-cyan transition-colors">
+          <div class="w-12 h-12 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-amber mb-6 group-hover:border-brand-amber transition-colors">
+            <i data-lucide="flame" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-brand-amber transition-colors">Energy &amp; Chemical Plants</h3>
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            Routine thermal inspection of steam pipelines, acoustic detection of gas leaks, and ATEX Zone certified hazardous inspection.
+          </p>
+          <ul class="mt-6 space-y-2 text-xs font-mono text-slate-400">
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-amber">&rsaquo;</span>
+              <span>Methane &amp; VOC Spectrometry</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-amber">&rsaquo;</span>
+              <span>Gauge Reading OCR Automation</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-amber">&rsaquo;</span>
+              <span>Stair &amp; Grating Navigation</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Subterranean & Disaster Response -->
+        <div class="bg-brand-panel border border-brand-border rounded-xl p-6 relative overflow-hidden group hover:border-brand-cyan transition-colors">
+          <div class="w-12 h-12 rounded-lg bg-brand-dark border border-brand-border flex items-center justify-center text-brand-emerald mb-6 group-hover:border-brand-emerald transition-colors">
+            <i data-lucide="mountain" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-brand-emerald transition-colors">Mining &amp; Search / Rescue</h3>
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            Unexplored underground drift mapping, collapsed structural inspection, and zero-visibility smoke navigation with millimeter-wave radar.
+          </p>
+          <ul class="mt-6 space-y-2 text-xs font-mono text-slate-400">
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-emerald">&rsaquo;</span>
+              <span>GPS-Denied 3D SLAM Mesh</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-emerald">&rsaquo;</span>
+              <span>Two-way audio distress intercom</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="text-brand-emerald">&rsaquo;</span>
+              <span>Deep Mud &amp; Boulder Scrambling</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INTERACTIVE FLEET DEPLOYMENT CALCULATOR -->
+  <section id="calculator" class="py-24 bg-brand-dark border-b border-brand-border relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-mono text-brand-cyan tracking-widest uppercase">// ENTERPRISE ESTIMATION TOOL</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-1 uppercase">Configure Your Autonomous Fleet</h2>
+        <p class="text-slate-400 text-sm mt-3">
+          Select chassis models, mission modules, autonomous docking docks, and defense SLAs for an immediate deployment estimate.
+        </p>
+      </div>
+
+      <div class="bg-brand-panel border border-brand-border rounded-xl p-6 lg:p-10 shadow-2xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          
+          <!-- Controls Column (7 Cols) -->
+          <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Select Model -->
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">1. Select Chassis Platform</label>
+              <div class="grid grid-cols-3 gap-3">
+                <button type="button" onclick="calcSelectPlatform('ALPHA', 42000)" id="calc-model-ALPHA" class="calc-btn p-3 rounded bg-brand-dark border border-brand-border text-left hover:border-brand-cyan transition">
+                  <div class="text-xs font-bold text-white font-mono">HUND ALPHA</div>
+                  <div class="text-[11px] text-slate-400 font-mono mt-1">$42,000 / unit</div>
+                </button>
+                <button type="button" onclick="calcSelectPlatform('APEX', 78000)" id="calc-model-APEX" class="calc-btn p-3 rounded bg-brand-cyan/15 border-2 border-brand-cyan text-left transition">
+                  <div class="text-xs font-bold text-brand-cyan font-mono">HUND APEX</div>
+                  <div class="text-[11px] text-slate-300 font-mono mt-1">$78,000 / unit</div>
+                </button>
+                <button type="button" onclick="calcSelectPlatform('CERBERUS', 115000)" id="calc-model-CERBERUS" class="calc-btn p-3 rounded bg-brand-dark border border-brand-border text-left hover:border-brand-cyan transition">
+                  <div class="text-xs font-bold text-white font-mono">CERBERUS</div>
+                  <div class="text-[11px] text-slate-400 font-mono mt-1">$115,000 / unit</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Fleet Size Slider -->
+            <div>
+              <div class="flex justify-between items-center text-xs font-mono text-slate-400 mb-2">
+                <span>2. FLEET UNIT COUNT</span>
+                <span id="calc-qty-label" class="text-brand-cyan font-bold text-base">3 Units</span>
+              </div>
+              <input id="calc-quantity" type="range" min="1" max="25" value="3" oninput="updateCalculation()" class="w-full h-2 bg-brand-dark rounded-lg accent-brand-cyan cursor-pointer">
+              <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+                <span>1 Unit (Evaluation)</span>
+                <span>10 Units (Squadron)</span>
+                <span>25 Units (Battalion)</span>
+              </div>
+            </div>
+
+            <!-- Add-on Payloads -->
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">3. Modular Mission Kits</label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                
+                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
+                  <input type="checkbox" id="addon-arm" onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
+                  <div>
+                    <span class="text-slate-200 block">6-DOF Manipulator Arm</span>
+                    <span class="text-[10px] text-slate-400">+$18,500 / unit</span>
+                  </div>
+                </label>
+
+                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
+                  <input type="checkbox" id="addon-dock" checked onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
+                  <div>
+                    <span class="text-slate-200 block">Autonomous Weatherproof Dock</span>
+                    <span class="text-[10px] text-slate-400">+$12,000 / unit</span>
+                  </div>
+                </label>
+
+                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
+                  <input type="checkbox" id="addon-lidar" checked onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
+                  <div>
+                    <span class="text-slate-200 block">Ouster 128-Beam LiDAR</span>
+                    <span class="text-[10px] text-slate-400">+$14,200 / unit</span>
+                  </div>
+                </label>
+
+                <label class="flex items-center space-x-3 p-3 bg-brand-dark border border-brand-border rounded cursor-pointer hover:border-brand-border/80">
+                  <input type="checkbox" id="addon-cbrn" onchange="updateCalculation()" class="w-4 h-4 rounded text-brand-cyan bg-brand-panel border-brand-border accent-brand-cyan">
+                  <div>
+                    <span class="text-slate-200 block">CBRN Sniffer Array</span>
+                    <span class="text-[10px] text-slate-400">+$9,500 / unit</span>
+                  </div>
+                </label>
+
+              </div>
+            </div>
+
+            <!-- Software / SLA -->
+            <div>
+              <label class="block text-xs font-mono text-slate-400 uppercase tracking-wider mb-2">4. Autonomy &amp; Mission Control Suite</label>
+              <select id="calc-software" onchange="updateCalculation()" class="w-full bg-brand-dark border border-brand-border rounded p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-brand-cyan">
+                <option value="9000">HUND FleetOS Core (Standard SLAM + Tele-op) - $9,000 / yr</option>
+                <option value="22000" selected>HUND Defense Swarm AI (Autonomous Patrol + Mesh Handover) - $22,000 / yr</option>
+                <option value="45000">HUND Tactical Enterprise (Full ROS2 Stack + Air-gapped Defense SLA) - $45,000 / yr</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Summary & Quote Output Column (5 Cols) -->
+          <div class="lg:col-span-5 bg-brand-dark border border-brand-border rounded-xl p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-brand-border pb-4 mb-4">
+                <span class="font-mono text-xs text-slate-400 uppercase">ENTERPRISE CONFIGURATION SUMMARY</span>
+                <span class="w-2 h-2 rounded-full bg-brand-cyan"></span>
+              </div>
+
+              <div class="space-y-3 font-mono text-xs text-slate-300">
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Base Unit Model:</span>
+                  <span id="summary-model" class="text-white font-bold">HUND APEX ($78,000)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Unit Quantity:</span>
+                  <span id="summary-qty" class="text-white">3 Units</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Hardware Subtotal:</span>
+                  <span id="summary-hw-total" class="text-brand-cyan">$312,600</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Software &amp; Swarm SLA:</span>
+                  <span id="summary-sw-total" class="text-slate-200">$22,000 / yr</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Estimated Delivery:</span>
+                  <span class="text-brand-emerald">3 - 5 Weeks</span>
+                </div>
+              </div>
+
+              <!-- Estimated Total Box -->
+              <div class="mt-8 p-4 bg-brand-panel border border-brand-cyan/40 rounded-lg">
+                <div class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Estimated Investment (Year 1)</div>
+                <div id="summary-grand-total" class="text-3xl font-extrabold font-mono text-white mt-1 text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-white">
+                  $334,600
+                </div>
+                <div class="text-[10px] font-mono text-slate-500 mt-1">Excludes local defense tariffs &amp; on-site training.</div>
+              </div>
+            </div>
+
+            <!-- Submission Form Trigger -->
+            <div class="mt-8">
+              <div class="space-y-3">
+                <input id="rfq-email" type="email" placeholder="official@defense.gov or corporate email" class="w-full bg-brand-panel border border-brand-border rounded p-3 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-cyan">
+                <button type="button" onclick="handleQuoteSubmit()" class="w-full py-3 bg-brand-cyan text-brand-black text-xs font-mono font-bold tracking-widest uppercase rounded hover:bg-white transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+                  TRANSMIT OFFICIAL RFQ &rarr;
+                </button>
+              </div>
+              <div id="rfq-notification" class="hidden mt-3 p-2 bg-brand-emerald/10 border border-brand-emerald rounded text-center text-xs font-mono text-brand-emerald">
+                &check; RFQ Encrypted &amp; Dispatched to Mission Engineering.
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-brand-black border-t border-brand-border py-12 text-slate-500 text-xs font-mono">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-7 h-7 bg-brand-panel border border-brand-border rounded flex items-center justify-center text-brand-cyan font-bold">H</div>
+          <span class="text-white font-bold tracking-wider">HUND ROBOTICS INC.</span>
+          <span>&copy; 2026. All rights reserved.</span>
+        </div>
+        <div class="flex flex-wrap gap-6 text-slate-400">
+          <a href="#" class="hover:text-brand-cyan transition">MIL-STD-810H</a>
+          <a href="#" class="hover:text-brand-cyan transition">ITAR Compliant</a>
+          <a href="#" class="hover:text-brand-cyan transition">Security Whitepaper</a>
+          <a href="#" class="hover:text-brand-cyan transition">Terms of Autonomy</a>
+        </div>
+      </div>
+      <div class="mt-6 pt-6 border-t border-brand-border/40 text-[10px] text-slate-600 flex justify-between flex-wrap gap-2">
+        <span>Designed for extreme robotics operations. Export Control Notice: Autonomous systems may require state authorization.</span>
+        <span>LAT: 33.9533° N, LON: 117.3962° W</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       THREE.JS PROCEDURAL QUADRUPED ROBOT SIMULATOR
+       ========================================================================== */
+    let scene, camera, renderer, quadrupedGroup;
+    let legs = [];
+    let clock = new THREE.Clock();
+    let currentGait = 'trot'; // 'trot', 'crawl', 'stand', 'leap'
+    let currentVision = 'optical'; // 'optical', 'lidar', 'thermal'
+    let baseHeight = 1.15;
+    let gaitSpeed = 5.0;
+    let isLeaping = false;
+    let leapTimer = 0;
+
+    // Materials dictionary for sensor views
+    let robotMaterials = {
+      chassis: null,
+      joints: null,
+      accents: null,
+      groundGrid: null
+    };
+
+    function init3DSimulator() {
+      const container = document.getElementById('three-quadruped-container');
+      if (!container) return;
+
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      // 1. Scene setup
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0e17);
+      scene.fog = new THREE.FogExp2(0x0a0e17, 0.045);
+
+      // 2. Camera setup
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+      camera.position.set(3.5, 2.5, 4.5);
+      camera.lookAt(0, 0.6, 0);
+
+      // 3. Renderer setup
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      // 4. Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0x00f0ff, 1.8);
+      mainLight.position.set(5, 8, 5);
+      mainLight.castShadow = true;
+      mainLight.shadow.mapSize.width = 1024;
+      mainLight.shadow.mapSize.height = 1024;
+      scene.add(mainLight);
+
+      const fillLight = new THREE.DirectionalLight(0xff0055, 0.8);
+      fillLight.position.set(-5, 3, -5);
+      scene.add(fillLight);
+
+      // 5. Ground Tech Grid
+      const gridHelper = new THREE.GridHelper(30, 60, 0x00f0ff, 0x1f293d);
+      gridHelper.position.y = 0;
+      scene.add(gridHelper);
+
+      // Ground plane for shadow
+      const groundGeo = new THREE.PlaneGeometry(50, 50);
+      const groundMat = new THREE.MeshStandardMaterial({
+        color: 0x07090e,
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+      groundMesh.rotation.x = -Math.PI / 2;
+      groundMesh.receiveShadow = true;
+      scene.add(groundMesh);
+
+      // 6. Build Procedural Quadruped Mesh Structure
+      buildQuadruped();
+
+      // Mouse Orbit controls (procedural drag)
+      setupOrbitInteraction(container);
+
+      // Height Slider listener
+      const heightSlider = document.getElementById('stance-slider');
+      if (heightSlider) {
+        heightSlider.addEventListener('input', (e) => {
+          baseHeight = parseFloat(e.target.value);
+        });
+      }
+
+      // Responsive window resize
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    // Build Robot Geometry
+    function buildQuadruped() {
+      quadrupedGroup = new THREE.Group();
+      quadrupedGroup.position.y = baseHeight;
+
+      // Default Optical Wireframe / Dark Tech Materials
+      robotMaterials.chassis = new THREE.MeshStandardMaterial({
+        color: 0x121824,
+        roughness: 0.3,
+        metalness: 0.85,
+        wireframe: false
+      });
+
+      robotMaterials.joints = new THREE.MeshStandardMaterial({
+        color: 0x2a3852,
+        roughness: 0.4,
+        metalness: 0.9
+      });
+
+      robotMaterials.accents = new THREE.MeshBasicMaterial({
+        color: 0x00f0ff,
+        wireframe: false
+      });
+
+      // Chassis Body (Main Torso)
+      const bodyGeo = new THREE.BoxGeometry(0.7, 0.3, 1.4);
+      const bodyMesh = new THREE.Mesh(bodyGeo, robotMaterials.chassis);
+      bodyMesh.castShadow = true;
+      bodyMesh.receiveShadow = true;
+      quadrupedGroup.add(bodyMesh);
+
+      // Dorsal Armor Spine
+      const spineGeo = new THREE.BoxGeometry(0.5, 0.1, 1.2);
+      const spineMesh = new THREE.Mesh(spineGeo, robotMaterials.joints);
+      spineMesh.position.y = 0.18;
+      quadrupedGroup.add(spineMesh);
+
+      // Sensor Head Unit (LiDAR / Optics)
+      const headGeo = new THREE.BoxGeometry(0.35, 0.22, 0.35);
+      const headMesh = new THREE.Mesh(headGeo, robotMaterials.chassis);
+      headMesh.position.set(0, 0.14, 0.75);
+      quadrupedGroup.add(headMesh);
+
+      // Cyber Vision Visor Line
+      const visorGeo = new THREE.BoxGeometry(0.3, 0.05, 0.05);
+      const visorMesh = new THREE.Mesh(visorGeo, robotMaterials.accents);
+      visorMesh.position.set(0, 0.14, 0.93);
+      quadrupedGroup.add(visorMesh);
+
+      // LiDAR Dome
+      const lidarDome = new THREE.CylinderGeometry(0.1, 0.1, 0.08, 16);
+      const lidarMesh = new THREE.Mesh(lidarDome, robotMaterials.accents);
+      lidarMesh.position.set(0, 0.28, 0.4);
+      quadrupedGroup.add(lidarMesh);
+
+      // Legs Definition: [x, z, phaseOffset]
+      // Leg layout: Front-Left, Front-Right, Rear-Left, Rear-Right
+      const legPositions = [
+        { x: -0.42, z: 0.55, phase: 0 },             // FL
+        { x: 0.42, z: 0.55, phase: Math.PI },        // FR
+        { x: -0.42, z: -0.55, phase: Math.PI },       // RL
+        { x: 0.42, z: -0.55, phase: 0 }              // RR
+      ];
+
+      legs = [];
+
+      legPositions.forEach(pos => {
+        const hipJoint = new THREE.Group();
+        hipJoint.position.set(pos.x, -0.05, pos.z);
+
+        // Shoulder Hub
+        const shoulderGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.14, 16);
+        shoulderGeo.rotateZ(Math.PI / 2);
+        const shoulderMesh = new THREE.Mesh(shoulderGeo, robotMaterials.joints);
+        hipJoint.add(shoulderMesh);
+
+        // Upper Leg Link (Femur)
+        const upperLegGroup = new THREE.Group();
+        upperLegGroup.position.set(pos.x > 0 ? 0.06 : -0.06, 0, 0);
+
+        const upperGeo = new THREE.BoxGeometry(0.09, 0.5, 0.1);
+        const upperMesh = new THREE.Mesh(upperGeo, robotMaterials.chassis);
+        upperMesh.position.y = -0.22;
+        upperMesh.castShadow = true;
+        upperLegGroup.add(upperMesh);
+
+        // Knee Joint
+        const kneeGroup = new THREE.Group();
+        kneeGroup.position.y = -0.44;
+
+        const kneeJointGeo = new THREE.SphereGeometry(0.065, 12, 12);
+        const kneeMesh = new THREE.Mesh(kneeJointGeo, robotMaterials.joints);
+        kneeGroup.add(kneeMesh);
+
+        // Lower Leg Link (Tibia)
+        const lowerGeo = new THREE.CylinderGeometry(0.04, 0.02, 0.55, 8);
+        const lowerMesh = new THREE.Mesh(lowerGeo, robotMaterials.joints);
+        lowerMesh.position.y = -0.26;
+        lowerMesh.castShadow = true;
+        kneeGroup.add(lowerMesh);
+
+        // Rubber Foot Pad
+        const footGeo = new THREE.SphereGeometry(0.05, 12, 12);
+        const footMesh = new THREE.Mesh(footGeo, robotMaterials.accents);
+        footMesh.position.y = -0.54;
+        kneeGroup.add(footMesh);
+
+        upperLegGroup.add(kneeGroup);
+        hipJoint.add(upperLegGroup);
+        quadrupedGroup.add(hipJoint);
+
+        legs.push({
+          hip: hipJoint,
+          upper: upperLegGroup,
+          knee: kneeGroup,
+          phase: pos.phase,
+          baseX: pos.x,
+          baseZ: pos.z
+        });
+      });
+
+      scene.add(quadrupedGroup);
+    }
+
+    // Gait Calculation Loop
+    function updateLegKinematics(time) {
+      if (!quadrupedGroup) return;
+
+      // Handle Jump/Reckon Pulse
+      if (isLeaping) {
+        leapTimer += 0.05;
+        const jumpY = Math.sin(leapTimer * Math.PI) * 0.8;
+        quadrupedGroup.position.y = baseHeight + Math.max(0, jumpY);
+        
+        // Tuck legs during jump
+        legs.forEach((leg, i) => {
+          leg.upper.rotation.x = -0.6;
+          leg.knee.rotation.x = 1.2;
+        });
+
+        if (leapTimer >= 1.0) {
+          isLeaping = false;
+          leapTimer = 0;
+          quadrupedGroup.position.y = baseHeight;
+        }
+        return;
+      }
+
+      // Gait dynamics
+      if (currentGait === 'stand') {
+        quadrupedGroup.position.y = THREE.MathUtils.lerp(quadrupedGroup.position.y, baseHeight, 0.1);
+        quadrupedGroup.rotation.z = THREE.MathUtils.lerp(quadrupedGroup.rotation.z, 0, 0.1);
+        quadrupedGroup.rotation.x = THREE.MathUtils.lerp(quadrupedGroup.rotation.x, 0, 0.1);
+
+        legs.forEach(leg => {
+          leg.upper.rotation.x = THREE.MathUtils.lerp(leg.upper.rotation.x, 0.15, 0.1);
+          leg.knee.rotation.x = THREE.MathUtils.lerp(leg.knee.rotation.x, -0.3, 0.1);
+          leg.upper.rotation.z = THREE.MathUtils.lerp(leg.upper.rotation.z, 0, 0.1);
+        });
+        return;
+      }
+
+      // Trot or Crawl Gait Math
+      const freq = currentGait === 'trot' ? gaitSpeed : gaitSpeed * 0.45;
+      const legAmplitude = currentGait === 'trot' ? 0.35 : 0.22;
+      const kneeAmplitude = currentGait === 'trot' ? 0.45 : 0.3;
+
+      // Sway & Bob
+      const bob = Math.cos(time * freq * 2) * 0.04;
+      const rollSway = Math.sin(time * freq) * 0.02;
+      quadrupedGroup.position.y = baseHeight + bob;
+      quadrupedGroup.rotation.z = rollSway;
+      quadrupedGroup.rotation.x = -bob * 0.4;
+
+      legs.forEach((leg, idx) => {
+        let phase = leg.phase;
+        // In crawl gait, make 4 distinct phase offsets
+        if (currentGait === 'crawl') {
+          phase = idx * (Math.PI / 2);
+        }
+
+        const cycle = time * freq + phase;
+        const upperAngle = Math.sin(cycle) * legAmplitude;
+        const kneeAngle = Math.max(0, Math.cos(cycle) * kneeAmplitude) - 0.25;
+
+        leg.upper.rotation.x = upperAngle;
+        leg.knee.rotation.x = -kneeAngle - 0.15;
+      });
+    }
+
+    // Vision Mode HUD Switcher
+    function setVisionMode(mode) {
+      currentVision = mode;
+      
+      const btnOptical = document.getElementById('btn-hud-optical');
+      const btnLidar = document.getElementById('btn-hud-lidar');
+      const btnThermal = document.getElementById('btn-hud-thermal');
+
+      [btnOptical, btnLidar, btnThermal].forEach(btn => {
+        if(btn) {
+          btn.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-border text-slate-400 transition-all hover:border-brand-cyan hover:text-white";
+        }
+      });
+
+      if (mode === 'optical') {
+        btnOptical.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-cyan text-brand-cyan";
+        robotMaterials.chassis.wireframe = true;
+        robotMaterials.chassis.color.setHex(0x00f0ff);
+        robotMaterials.joints.color.setHex(0x1e293b);
+        robotMaterials.accents.color.setHex(0xffffff);
+        scene.background.setHex(0x07090e);
+        updateLogStatus("Vision HUD: Optical Wireframe Mesh & Kinematic Bounds active");
+      } else if (mode === 'lidar') {
+        btnLidar.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-emerald text-brand-emerald";
+        robotMaterials.chassis.wireframe = false;
+        robotMaterials.chassis.color.setHex(0x022c22);
+        robotMaterials.joints.color.setHex(0x00ff88);
+        robotMaterials.accents.color.setHex(0x00ff88);
+        scene.background.setHex(0x04130e);
+        updateLogStatus("Vision HUD: 128-Beam Solid-State LiDAR Point Cloud rendering");
+      } else if (mode === 'thermal') {
+        btnThermal.className = "px-2.5 py-1 text-[11px] font-mono rounded bg-brand-panel/90 border border-brand-crimson text-brand-crimson";
+        robotMaterials.chassis.wireframe = false;
+        robotMaterials.chassis.color.setHex(0x6b001a);
+        robotMaterials.joints.color.setHex(0xffaa00);
+        robotMaterials.accents.color.setHex(0xff003c);
+        scene.background.setHex(0x180508);
+        updateLogStatus("Vision HUD: Long-Wave FLIR Thermal Spectrum calibrated");
+      }
+    }
+
+    // Gait Controls
+    function setGait(gait) {
+      currentGait = gait;
+      const bTrot = document.getElementById('gait-trot');
+      const bCrawl = document.getElementById('gait-crawl');
+      const bStand = document.getElementById('gait-stand');
+
+      [bTrot, bCrawl, bStand].forEach(b => {
+        if(b) b.className = "px-2.5 py-1 text-xs font-mono rounded bg-brand-dark border border-brand-border text-slate-300 hover:border-brand-cyan transition";
+      });
+
+      if (gait === 'trot') {
+        bTrot.className = "px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition";
+        updateLogStatus("Inverse Kinematics: Fast Trot Dynamic Balance [STABLE]");
+      } else if (gait === 'crawl') {
+        bCrawl.className = "px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition";
+        updateLogStatus("Inverse Kinematics: Creep Crawl Terrain Traverse [HIGH TORQUE]");
+      } else if (gait === 'stand') {
+        bStand.className = "px-2.5 py-1 text-xs font-mono font-bold rounded bg-brand-cyan text-brand-black transition";
+        updateLogStatus("Inverse Kinematics: Stance Hold Zero-Moment Point lock");
+      }
+    }
+
+    function triggerAgileLeap() {
+      if (isLeaping) return;
+      isLeaping = true;
+      leapTimer = 0;
+      updateLogStatus("Agile Maneuver: High Dynamic Leap / Trench Clearance initiated");
+    }
+
+    function updateLogStatus(text) {
+      const el = document.getElementById('live-sim-status');
+      if (el) el.innerHTML = `&gt; ${text}`;
+    }
+
+    // Orbit Interaction Implementation (Vanilla Three.js Mouse/Touch handler)
+    function setupOrbitInteraction(container) {
+      let isDragging = false;
+      let prevMousePos = { x: 0, y: 0 };
+      let spherical = { radius: 5.5, theta: 0.8, phi: 1.1 };
+
+      function updateCameraFromSpherical() {
+        spherical.phi = Math.max(0.2, Math.min(Math.PI / 2.1, spherical.phi));
+        camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
+        camera.position.y = spherical.radius * Math.cos(spherical.phi);
+        camera.position.z = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
+        camera.lookAt(0, 0.5, 0);
+      }
+
+      container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        prevMousePos = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - prevMousePos.x;
+        const deltaY = e.clientY - prevMousePos.y;
+        prevMousePos = { x: e.clientX, y: e.clientY };
+
+        spherical.theta -= deltaX * 0.008;
+        spherical.phi -= deltaY * 0.008;
+        updateCameraFromSpherical();
+      });
+
+      // Wheel Zoom
+      container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        spherical.radius += e.deltaY * 0.003;
+        spherical.radius = Math.max(2.5, Math.min(10.0, spherical.radius));
+        updateCameraFromSpherical();
+      }, { passive: false });
+
+      // Touch handlers for mobile
+      container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+      });
+      window.addEventListener('touchend', () => { isDragging = false; });
+      container.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        const deltaX = e.touches[0].clientX - prevMousePos.x;
+        const deltaY = e.touches[0].clientY - prevMousePos.y;
+        prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+
+        spherical.theta -= deltaX * 0.009;
+        spherical.phi -= deltaY * 0.009;
+        updateCameraFromSpherical();
+      });
+
+      updateCameraFromSpherical();
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('three-quadruped-container');
+      if (!container || !renderer || !camera) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    // Main 3D Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+
+      // Kinematic update
+      updateLegKinematics(elapsedTime);
+
+      // Subtle idle yaw rotation if optical mode
+      if (quadrupedGroup && currentGait !== 'stand') {
+        quadrupedGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.05;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // Synthetic SLAM LiDAR Radar Canvas
+    let radarPoints = [];
+    function initLidarRadar() {
+      const canvas = document.getElementById('lidar-radar-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const center = w / 2;
+
+      // Generate synthetic room perimeter points
+      for (let i = 0; i < 48; i++) {
+        const angle = (i / 48) * Math.PI * 2;
+        const dist = 75 + Math.random() * 45;
+        radarPoints.push({ angle, dist });
+      }
+
+      let scanAngle = 0;
+
+      function drawRadar() {
+        ctx.fillStyle = 'rgba(12, 16, 23, 0.25)';
+        ctx.fillRect(0, 0, w, h);
+
+        // Concentric Range Rings
+        ctx.strokeStyle = '#1f293d';
+        ctx.lineWidth = 1;
+        [30, 65, 100, 135].forEach(r => {
+          ctx.beginPath();
+          ctx.arc(center, center, r, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+
+        // Crosshairs
+        ctx.beginPath();
+        ctx.moveTo(center, 0); ctx.lineTo(center, h);
+        ctx.moveTo(0, center); ctx.lineTo(w, center);
+        ctx.strokeStyle = '#172033';
+        ctx.stroke();
+
+        // Scanline sweep
+        scanAngle += 0.04;
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.lineTo(center + Math.cos(scanAngle) * 135, center + Math.sin(scanAngle) * 135);
+        ctx.stroke();
+
+        // Points
+        radarPoints.forEach(pt => {
+          const px = center + Math.cos(pt.angle) * pt.dist;
+          const py = center + Math.sin(pt.angle) * pt.dist;
+          ctx.fillStyle = '#00ff88';
+          ctx.beginPath();
+          ctx.arc(px, py, 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        requestAnimationFrame(drawRadar);
+      }
+      drawRadar();
+    }
+
+    // Live Telemetry stream ticker
+    function startTelemetryTick() {
+      setInterval(() => {
+        // Jitter joint temperatures & torque
+        const fl = 38.0 + Math.random() * 2.5;
+        const fr = 38.5 + Math.random() * 2.8;
+        const rl = 43.0 + Math.random() * 3.5;
+        const rr = 37.5 + Math.random() * 2.2;
+
+        const flEl = document.getElementById('temp-fl');
+        if (flEl) flEl.innerText = `${fl.toFixed(1)}°C / ${(fl * 1.1).toFixed(0)} Nm`;
+        const frEl = document.getElementById('temp-fr');
+        if (frEl) frEl.innerText = `${fr.toFixed(1)}°C / ${(fr * 1.15).toFixed(0)} Nm`;
+        const rlEl = document.getElementById('temp-rl');
+        if (rlEl) rlEl.innerText = `${rl.toFixed(1)}°C / ${(rl * 1.3).toFixed(0)} Nm`;
+        const rrEl = document.getElementById('temp-rr');
+        if (rrEl) rrEl.innerText = `${rr.toFixed(1)}°C / ${(rr * 1.05).toFixed(0)} Nm`;
+
+        // Update progress bars
+        const bFL = document.getElementById('bar-temp-fl');
+        if (bFL) bFL.style.width = `${Math.min(100, fl * 1.1)}%`;
+        const bFR = document.getElementById('bar-temp-fr');
+        if (bFR) bFR.style.width = `${Math.min(100, fr * 1.1)}%`;
+        const bRL = document.getElementById('bar-temp-rl');
+        if (bRL) bRL.style.width = `${Math.min(100, rl * 1.2)}%`;
+        const bRR = document.getElementById('bar-temp-rr');
+        if (bRR) bRR.style.width = `${Math.min(100, rr * 1.05)}%`;
+
+        // Attitude angles
+        const pitchEl = document.getElementById('tele-pitch');
+        if (pitchEl) pitchEl.innerText = `${(Math.sin(Date.now() * 0.002) * 2.2).toFixed(1)}°`;
+        const rollEl = document.getElementById('tele-roll');
+        if (rollEl) rollEl.innerText = `${(Math.cos(Date.now() * 0.0018) * 1.8).toFixed(1)}°`;
+
+        // Ping jitter
+        const pingEl = document.getElementById('tele-ping');
+        if (pingEl) pingEl.innerText = `${Math.floor(12 + Math.random() * 6)} ms`;
+      }, 1200);
+    }
+
+    function appendTelemetryLog(msg, type = 'info') {
+      const box = document.getElementById('telemetry-log-box');
+      if (!box) return;
+      const item = document.createElement('div');
+      const timeStr = new Date().toTimeString().split(' ')[0];
+      
+      let badge = '<span class="text-brand-cyan">[CMD]</span>';
+      if (type === 'warn') badge = '<span class="text-brand-amber">[WARN]</span>';
+      if (type === 'crit') badge = '<span class="text-brand-crimson">[ALERT]</span>';
+      if (type === 'ok') badge = '<span class="text-brand-emerald">[ACK]</span>';
+
+      item.innerHTML = `${badge} <span class="text-slate-500">${timeStr}</span> ${msg}`;
+      box.prepend(item);
+    }
+
+    function simulateMissionCommand(cmd) {
+      if (cmd === 'RETURN_HOME') {
+        appendTelemetryLog("AUTONOMOUS ROUTE RE-PLAN: Heading to Alpha Dock (Lat 34.052, Lon -118.243)", "ok");
+      } else if (cmd === 'EMERGENCY_STOP') {
+        appendTelemetryLog("IMMEDIATE E-STOP TRIGGERED: Electromagnetic brakes engaged. Torque dump zero.", "crit");
+        setGait('stand');
+      }
+    }
+
+    function injectSimObstacle() {
+      appendTelemetryLog("Perception Alert: Dynamic negative obstacle (drop-off 1.2m) avoided via local costmap.", "warn");
+      // Add blip to radar points
+      radarPoints.push({
+        angle: Math.random() * Math.PI * 2,
+        dist: 40 + Math.random() * 20
+      });
+      if (radarPoints.length > 60) radarPoints.shift();
+    }
+
+    // Payload Data and Customizer
+    const payloadData = {
+      arm: {
+        code: "SYS-MOD-ARM06",
+        title: "H-ARM6 Tactile Manipulator",
+        desc: "Equipped with 6 degrees of freedom, continuous wrist rotation, and force-torque feedback sensors. Capable of door breach manipulation, valve turns in high-radiation zones, and sample gathering.",
+        stat1: "920 mm",
+        stat2: "6.5 kg (Extended)",
+        stat3: "CANopen / ROS2",
+        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="50" cy="50" r="38" stroke-dasharray="4,4" class="text-brand-border" />
+                <path d="M50 20 L50 45 L70 65" stroke-linecap="round" stroke-width="3" stroke="#00f0ff"/>
+                <circle cx="50" cy="20" r="5" fill="#00f0ff"/>
+                <circle cx="70" cy="65" r="4" fill="#ffaa00"/>
+                <path d="M68 62 L78 54" stroke="#ffaa00" stroke-linecap="round"/>
+                <path d="M72 68 L82 60" stroke="#ffaa00" stroke-linecap="round"/>
+              </svg>`
+      },
+      lidar: {
+        code: "SYS-MOD-LIDAR128",
+        title: "360° Ultra-Dense LiDAR Mast",
+        desc: "Dual-axis scanning LiDAR with 1.3 million points per second output, built-in IMU, and sunlight rejection filters for daytime open-pit mining operations and millimeter-accurate 3D as-built twin capture.",
+        stat1: "150 m Range",
+        stat2: "128 Channels",
+        stat3: "Gigabit M12 Eth",
+        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
+                <cylinder cx="50" cy="50" r="30" class="text-brand-border" />
+                <rect x="36" y="30" width="28" height="40" rx="4" stroke="#00ff88" fill="#121824"/>
+                <line x1="36" y1="45" x2="64" y2="45" stroke="#00ff88"/>
+                <circle cx="50" cy="38" r="3" fill="#00ff88"/>
+                <path d="M20 50 A30 30 0 0 1 80 50" stroke="#00ff88" stroke-dasharray="3,3"/>
+              </svg>`
+      },
+      cbrn: {
+        code: "SYS-MOD-CBRN09",
+        title: "CBRN HazMat Vapor Spectrometer",
+        desc: "Integrated electrochemical and photoionization detection array. Detects chemical warfare agents, volatile organic compounds, ammonia, chlorine, and toxic industrial gases without exposing human operators.",
+        stat1: "0.1 ppb Limit",
+        stat2: "24 Gas Library",
+        stat3: "ATEX Certified",
+        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polygon points="50,22 80,72 20,72" stroke="#ffaa00" fill="#121824" stroke-width="2"/>
+                <circle cx="50" cy="54" r="8" stroke="#ffaa00"/>
+                <line x1="50" y1="36" x2="50" y2="44" stroke="#ffaa00" stroke-width="2"/>
+                <circle cx="50" cy="64" r="1.5" fill="#ffaa00"/>
+              </svg>`
+      },
+      ptz: {
+        code: "SYS-MOD-PTZ40X",
+        title: "Long-Range EO/IR Gimbal PTZ",
+        desc: "Gyrostabilized EO/IR multi-sensor payload with 40x optical zoom, long-wave thermal imaging, and continuous laser rangefinder targeting for high-threat base border surveillance and reconnaissance.",
+        stat1: "3.2 km Target ID",
+        stat2: "40x Optical",
+        stat3: "Mil-Std-461G",
+        svg: `<svg class="w-48 h-48" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="50" cy="48" r="24" stroke="#00f0ff" fill="#121824"/>
+                <circle cx="50" cy="48" r="14" stroke="#00f0ff"/>
+                <circle cx="50" cy="48" r="6" fill="#00f0ff"/>
+                <path d="M50 72 L50 84 M35 84 L65 84" stroke="#00f0ff" stroke-width="2"/>
+              </svg>`
+      }
+    };
+
+    function switchPayload(key) {
+      const data = payloadData[key];
+      if (!data) return;
+
+      // Update tabs styling
+      ['arm', 'lidar', 'cbrn', 'ptz'].forEach(k => {
+        const btn = document.getElementById(`tab-${k}`);
+        if (!btn) return;
+        if (k === key) {
+          btn.className = "payload-tab active py-3 px-4 rounded-lg bg-brand-cyan text-brand-black font-mono text-xs font-bold transition flex items-center justify-center space-x-2";
+        } else {
+          btn.className = "payload-tab py-3 px-4 rounded-lg bg-brand-dark border border-brand-border text-slate-300 font-mono text-xs hover:border-brand-cyan transition flex items-center justify-center space-x-2";
+        }
+      });
+
+      // Update contents
+      document.getElementById('payload-code').innerText = data.code;
+      document.getElementById('payload-title').innerText = data.title;
+      document.getElementById('payload-desc').innerText = data.desc;
+      document.getElementById('payload-stat1').innerText = data.stat1;
+      document.getElementById('payload-stat2').innerText = data.stat2;
+      document.getElementById('payload-stat3').innerText = data.stat3;
+      document.getElementById('payload-diagram').innerHTML = data.svg;
+    }
+
+    // Fleet Quote Builder Logic
+    let selectedChassis = {
+      model: 'APEX',
+      price: 78000
+    };
+
+    function calcSelectPlatform(model, price) {
+      selectedChassis.model = model;
+      selectedChassis.price = price;
+
+      ['ALPHA', 'APEX', 'CERBERUS'].forEach(m => {
+        const b = document.getElementById(`calc-model-${m}`);
+        if (!b) return;
+        if (m === model) {
+          b.className = "calc-btn p-3 rounded bg-brand-cyan/15 border-2 border-brand-cyan text-left transition";
+          b.querySelector('div').className = "text-xs font-bold text-brand-cyan font-mono";
+        } else {
+          b.className = "calc-btn p-3 rounded bg-brand-dark border border-brand-border text-left hover:border-brand-cyan transition";
+          b.querySelector('div').className = "text-xs font-bold text-white font-mono";
+        }
+      });
+
+      updateCalculation();
+    }
+
+    function quickSelectFleet(model) {
+      const price = model === 'ALPHA' ? 42000 : (model === 'APEX' ? 78000 : 115000);
+      calcSelectPlatform(model, price);
+      const calcEl = document.getElementById('calculator');
+      if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function updateCalculation() {
+      const qtySlider = document.getElementById('calc-quantity');
+      const qty = parseInt(qtySlider.value, 10);
+      document.getElementById('calc-qty-label').innerText = `${qty} ${qty === 1 ? 'Unit' : 'Units'}`;
+      document.getElementById('summary-qty').innerText = `${qty} Units`;
+
+      // Hardware calculation
+      let unitHardwarePrice = selectedChassis.price;
+
+      if (document.getElementById('addon-arm')?.checked) unitHardwarePrice += 18500;
+      if (document.getElementById('addon-dock')?.checked) unitHardwarePrice += 12000;
+      if (document.getElementById('addon-lidar')?.checked) unitHardwarePrice += 14200;
+      if (document.getElementById('addon-cbrn')?.checked) unitHardwarePrice += 9500;
+
+      const totalHardware = unitHardwarePrice * qty;
+      const softwareCost = parseInt(document.getElementById('calc-software').value, 10);
+      const grandTotal = totalHardware + softwareCost;
+
+      // Update DOM
+      document.getElementById('summary-model').innerText = `HUND ${selectedChassis.model} ($${selectedChassis.price.toLocaleString()})`;
+      document.getElementById('summary-hw-total').innerText = `$${totalHardware.toLocaleString()}`;
+      document.getElementById('summary-sw-total').innerText = `$${softwareCost.toLocaleString()} / yr`;
+      document.getElementById('summary-grand-total').innerText = `$${grandTotal.toLocaleString()}`;
+    }
+
+    function handleQuoteSubmit() {
+      const email = document.getElementById('rfq-email').value;
+      const notif = document.getElementById('rfq-notification');
+      if (!email || !email.includes('@')) {
+        notif.innerText = "! Please enter a valid organization or defense email address.";
+        notif.className = "mt-3 p-2 bg-brand-crimson/20 border border-brand-crimson rounded text-center text-xs font-mono text-brand-crimson block";
+        return;
+      }
+
+      notif.innerHTML = `&check; RFQ Encrypted & Dispatched. Engineering spec sent to <b>${email}</b>.`;
+      notif.className = "mt-3 p-2 bg-brand-emerald/15 border border-brand-emerald rounded text-center text-xs font-mono text-brand-emerald block";
+    }
+
+    // Master Window Load Init
+    window.onload = function() {
+      // 1. Initialize 3D WebGL Quadruped Simulator
+      init3DSimulator();
+      animate();
+
+      // 2. Initialize SLAM Radar Canvas
+      initLidarRadar();
+
+      // 3. Start Telemetry stream
+      startTelemetryTick();
+
+      // 4. Initialize Lucide Icons
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      // 5. Initial Quote calculation
+      updateCalculation();
+    };
+  </script>
+</body>
+</html>
